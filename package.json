@@ -1,32 +1,35 @@
 {
-  "name"    : "data_logger_grapher",
-  "productName"    : "data_logger_grapher",
-  "version" : "0.0.1",
-  "main"    : "main.js",
+  "name": "data_logger_grapher",
+  "productName": "data_logger_grapher",
+  "version": "0.0.2",
+  "main": "main.js",
   "browserify": {
-      "transform": [
-        "browserify-shim"
-      ]
-    },
-    "browser": {
-      "materialize": "./node_modules/materialize-css/dist/js/materialize.min.js"
-    },
-    "browserify-shim": {
-      "materialize": {
-          "exports" : "materialize"
-          }
-    },
-    "scripts": {
-        "start": "electron .",
-        "package": "electron-packager ./ data_logger_grapher --all --out ../app --version 0.0.1 --overwrite"
-    },
-    "devDependencies": {
-        "electron-packager": "^5.0.1",
-        "electron-prebuilt": "^0.30.3"
-    },
-    "dependencies": {
-        "fast-csv": "^1.1.0",
-        "hammerjs": "^2.0.6",
-        "materialize-css": "^0.97.6"
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browser": {
+    "materialize": "./node_modules/materialize-css/dist/js/materialize.min.js"
+  },
+  "browserify-shim": {
+    "materialize": {
+      "exports": "materialize"
     }
+  },
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . data_logger_grapher --platform=win32 --arch=x64 --version 0.37.8 --overwrite"
+  },
+  "devDependencies": {
+    "electron-packager": "^7.0.0",
+    "electron-prebuilt": "^0.37.8",
+    "electron-settings": "^1.0.4",
+    "materialize-css": "^0.97.6",
+    "rollup": "^0.26.2"
+  },
+  "dependencies": {
+    "fast-csv": "^1.1.0",
+    "hammerjs": "^2.0.6",
+    "materialize-css": "^0.97.6"
+  }
 }

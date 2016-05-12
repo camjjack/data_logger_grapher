@@ -1,15 +1,16 @@
-'use strict';
-
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
+//const Menu = electron.Menu;
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const globalShortcut = electron.globalShortcut;
 const dialog = require('electron').dialog;
 const fs = require('fs');
+const ipcMain = electron.ipcMain;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
+var settingsWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -21,11 +22,7 @@ app.on('window-all-closed', function() {
   }
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {
-  // Register a 'CommandOrControl+P' shortcut listener.
-  var ret = globalShortcut.register('CommandOrControl+P', function() {
+ipcMain.on('print-page', function() {
     mainWindow.webContents.printToPDF({ landscape: true}, function(error, data) {
         if (error) throw error;
         var file = dialog.showSaveDialog(mainWindow, { filters: [ { name: 'PDF', extensions: ['pdf'] }]});
@@ -37,8 +34,41 @@ app.on('ready', function() {
             });
         }
     });
-  });
+});
 
+ipcMain.on('open-settings-window', function () {
+    if (settingsWindow) {
+        return;
+    }
+
+    settingsWindow = new BrowserWindow({
+        frame: false,
+        height: 350,
+        resizable: false,
+        width: 400
+    });
+    settingsWindow.loadURL('file://' + __dirname + '/settings.html');
+    //settingsWindow.webContents.openDevTools();
+    settingsWindow.show();
+
+    settingsWindow.on('closed', function () {
+        settingsWindow = null;
+    });
+});
+
+ipcMain.on('close-settings-window', function (event, config) {
+        console.log('close-settings-window');
+    if (settingsWindow) {
+            console.log('settingsWindow closed');
+            var webContents = mainWindow.webContents;
+            webContents.send('reprocess', config);
+            settingsWindow.close();
+    }
+});
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function() {
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1024, height: 768 });
 
@@ -53,6 +83,9 @@ app.on('ready', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
+    if (settingsWindow) {
+            settingsWindow.close();
+    }
     mainWindow = null;
   });
 });
