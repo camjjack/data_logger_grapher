@@ -3,37 +3,40 @@ const remote = electron.remote;
 const configuration = require('./configuration.js');
 const ipcRenderer = electron.ipcRenderer;
 var config = configuration.config;
+var save = configuration.save;
 
 function saveConfig() {
 
     var pivot = document.getElementById('pivot');
-    config.set('pivot', pivot.value);
+    config.pivot = pivot.value;
 
     var slider = document.getElementById('range');
     var range = slider.noUiSlider.get();
-    config.set('min_temp', parseInt(range[0]));
-    config.set('max_temp', parseInt(range[1]));
+    config.min_temp = parseInt(range[0]);
+    config.max_temp = parseInt(range[1]);
 
     var temperature = document.getElementById('temperature');
-    config.set('display_temp', temperature.checked);
+    config.display_temp = temperature.checked;
 
     var humitity = document.getElementById('humitity');
-    config.set('display_humidity', humitity.checked);
+    config.display_humidity = humitity.checked;
+    save(config);
+    
 
-    ipcRenderer.send('close-settings-window', config.get());
+    ipcRenderer.send('close-settings-window', config);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     var pivot = document.getElementById('pivot');
-    pivot.value = config.get('pivot');
+    pivot.value = config.pivot;
 
     var slider = document.getElementById('range');
     noUiSlider.create(slider, {
-        start: [config.get('min_temp'), config.get('max_temp')],
+        start: [config.min_temp, config.max_temp],
         connect: true,
         step: 1,
         range: {
-         'min': -20,
+         'min': -40,
          'max': 40
         },
         format: wNumb({
@@ -42,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
   var temperature = document.getElementById('temperature');
-  temperature.checked = config.get('display_temp');
+  temperature.checked = config.display_temp;
 
   var humitity = document.getElementById('humitity');
-  humitity.checked = config.get('display_humidity');
+  humitity.checked = config.display_humidity;
 });
