@@ -19,9 +19,6 @@ init:
 environment:
   nodejs_version: "6.9.2"
 
-cache:
-  - node_modules -> package.json
-
 install:
   - ps: Install-Product node $env:nodejs_version x64
   - git reset --hard HEAD
