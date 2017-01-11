@@ -38,8 +38,8 @@ artifacts:
     name: DataLoggerGrapher.exe
 
 deploy:
-  release: data-logger-grapher-v$(appveyor_build_version)
-  description: 'Release description'
+  release: data-logger-grapher-$(appveyor_repo_tag_name)
+  description: $(appveyor_repo_commit_message)
   provider: GitHub
   auth_token:
     secure: Z2FZ/HNODYB1tszgZxuYPEK6pKBLE44ZI/8Afx2ky1GyFVIGWOmjHMo8j4gFROvo # your encrypted token from GitHub
