@@ -30,7 +30,7 @@ build_script:
   - npm --version
   - npm run dist
 
-test:
+test_script:
   - npm run test
 
 artifacts:
