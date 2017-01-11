@@ -3,6 +3,12 @@
   "productName": "data_logger_grapher",
   "version": "0.0.4",
   "main": "main.js",
+  "description": "Compares two temperature data logger data sets use for refrigeration and print graphs and data associated with cooling periods etc.",
+  "author": {
+    "name": "Cameron Jack",
+    "email": "camjjack@gmail.com",
+    "url": "https://github.com/camjjack"
+  },
   "browserify": {
     "transform": [
       "browserify-shim"
@@ -16,19 +22,55 @@
       "exports": "materialize"
     }
   },
+  "build": {
+    "productName": "DataLoggerGrapher",
+    "appId": "org.camjack.DataLoggerGrapher",
+    "category": "public.app-category.tools",
+    "files": [
+      "node_modules/",
+      "app.js",
+      "configuration.js",
+      "import.js",
+      "index.html",
+      "main.js",
+      "menu.js",
+      "settings.html",
+      "settings.js",
+      "style.css",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ]
+    }
+  },
+  "bin": {
+    "electron": "./node_modules/.bin/electron"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:camjjack/data_logger_grapher.git"
+  },
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager . data_logger_grapher --platform=win32 --arch=x64 --version 0.37.8 --overwrite"
+    "pack": "build --dir",
+    "dist": "build",
+    "test": "./node_modules/.bin/mocha"
   },
   "devDependencies": {
+    "asn1": "^0.2.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "electron": "^1.4.13",
+    "electron-builder": "^11.2.3",
     "electron-mocha": "^3.3.0",
     "electron-packager": "^7.0.0",
     "electron-prebuilt": "^0.37.8",
-    "electron-settings": "^2.2.1",
-    "materialize-css": "^0.97.6",
     "mocha": "^3.2.0",
     "rollup": "^0.26.2"
   },
@@ -37,6 +79,7 @@
     "hammerjs": "^2.0.6",
     "materialize-css": "^0.97.6",
     "moment": "^2.17.1",
-    "xlsx-extractor": "^1.0.3"
+    "xlsx-extractor": "^1.0.3",
+    "electron-settings": "^2.2.1"
   }
 }

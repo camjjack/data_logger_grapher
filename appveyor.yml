@@ -1,0 +1,54 @@
+build: off
+
+platform:
+    - x64
+
+cache:
+  - node_modules
+  - app\node_modules
+  - '%APPDATA%\npm-cache'
+  - '%USERPROFILE%\.electron'
+    
+branches:
+  only:
+    - master
+
+init:
+  - git config --global core.autocrlf input
+
+environment:
+  nodejs_version: "6.9.2"
+
+cache:
+  - node_modules -> package.json
+
+install:
+  - ps: Install-Product node $env:nodejs_version x64
+  - git reset --hard HEAD
+  - npm install npm
+  - .\node_modules\.bin\npm install
+
+build_script:
+  - node --version
+  - npm --version
+  - npm run dist
+
+test:
+  - npm run test
+
+artifacts:
+  - path: dist\DataLoggerGrapher*\.exe
+    name: DataLoggerGrapher.exe
+
+deploy:
+  release: data-logger-grapher-v$(appveyor_build_version)
+  description: 'Release description'
+  provider: GitHub
+  auth_token:
+    secure: 255629b91f54a5b22d7e462da29a7817e7f8a07c # your encrypted token from GitHub
+  artifact: DataLoggerGrapher.exe
+  draft: false
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only
