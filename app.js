@@ -8,7 +8,6 @@ const remote = electron.remote;
 const dialog = electron.remote.dialog;
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
-//const Materialize = require('materialize-css');
 const menu = require('./menu.js');
 var configuration = require('./configuration.js');
 var config = configuration.config;

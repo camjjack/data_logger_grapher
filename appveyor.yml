@@ -35,7 +35,10 @@ test_script:
 
 artifacts:
   - path: dist\DataLoggerGrapher*.exe
-    name: DataLoggerGrapher.exe
+    name: DataLoggerGrapher.exe,
+    
+  - path: dist\latest.yml
+    name: latest.yml
 
 deploy:
   release: $(appveyor_repo_tag_name)
