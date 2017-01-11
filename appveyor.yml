@@ -34,7 +34,7 @@ test_script:
   - npm run test
 
 artifacts:
-  - path: dist\DataLoggerGrapher*\.exe
+  - path: dist\DataLoggerGrapher*.exe
     name: DataLoggerGrapher.exe
 
 deploy:
@@ -42,7 +42,7 @@ deploy:
   description: 'Release description'
   provider: GitHub
   auth_token:
-    secure: 255629b91f54a5b22d7e462da29a7817e7f8a07c # your encrypted token from GitHub
+    secure: Z2FZ/HNODYB1tszgZxuYPEK6pKBLE44ZI/8Afx2ky1GyFVIGWOmjHMo8j4gFROvo # your encrypted token from GitHub
   artifact: DataLoggerGrapher.exe
   draft: false
   prerelease: false
