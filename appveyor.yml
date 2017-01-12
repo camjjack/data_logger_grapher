@@ -4,10 +4,8 @@ platform:
     - x64
 
 cache:
-  - node_modules
-  - app\node_modules
+  - node_modules -> package.json
   - '%APPDATA%\npm-cache'
-  - '%USERPROFILE%\.electron'
     
 branches:
   only:
@@ -46,7 +44,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: Z2FZ/HNODYB1tszgZxuYPEK6pKBLE44ZI/8Afx2ky1GyFVIGWOmjHMo8j4gFROvo # your encrypted token from GitHub
-  artifact: DataLoggerGrapher.exe
+  artifact: DataLoggerGrapher.exe, latest.yml
   draft: false
   prerelease: false
   on:
