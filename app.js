@@ -1,6 +1,6 @@
 const electron = require('electron');
 var {importExcel, importCSV} = require( './import.js' );
-var {computeData} = require( './utils.js' );
+var {computeData} = require( './data.js' );
 const logger = require('./log.js');
 
 const remote = electron.remote;
@@ -17,7 +17,7 @@ var graph_data = {};
 var first_file = {};
 var second_file = {};
 
-var getTable = function(data_dict, start, end) {
+var getTable = function( data_dict, name ) {
     var s = "<table class='striped'><thead><tr><th data-field='item' colspan='2' class='center-align'>" + name + "</th></tr></thead><tbody>";
     s += "<tr><th>Sample time</th><td>" + data_dict.sampleTime / 60000 + " minutes</td></tr>";
     s += "<tr><th>% time spent cooling</th><td>" + data_dict.cooling_percentage + "%</td></tr>";
@@ -48,6 +48,7 @@ var processFile = function(file, graphDivName, tableDiv) {
     else {
        importCSV(file.path, config.max_temp, config.min_temp, config.pivot).then(function(csv_data_dict) {
             graph_data[file.name] = csv_data_dict;
+            console.log(graph_data[file.name] )
             doGraph(file.name, graphDivName, tableDiv);
        }, function(error) {
            Materialize.toast(error, 10000);
@@ -102,37 +103,31 @@ var doGraph = function(name, graphDivName, tableDiv) {
     Plotly.newPlot(gd, data, layout);
     */
 
-        var myDiv = document.getElementById('graph1');
+        var myDiv = document.getElementById(graphDivName);
 
     var d3 = Plotly.d3;
         
 
-    Plotly.plot(myDiv, data, layout);
+    Plotly.newPlot(myDiv, data, layout);
 
     myDiv.on('plotly_relayout',
         function(eventdata){  
-            var startTime = 0;
-            var endTime = 0;
-            logger.debug("start_time " + eventdata['xaxis.range[0]']);
-            logger.debug("end_time " + eventdata['xaxis.range[1]']);
-            // set the date range to be recalculated for the table data.
-            if( eventdata['xaxis.range[0]'] != undefined ) {
-               startTime = moment(eventdata['xaxis.range[0]']);
-            }
-            
-            if( eventdata['xaxis.range[1]'] != undefined ) {
-                endTime = moment(eventdata['xaxis.range[1]']);
-            }
-            var resized_graph_data = computeData(graph_data[name].data_entries, startTime, endTime);
+            var startTime = eventdata['xaxis.range[0]'] != undefined ? moment(eventdata['xaxis.range[0]']) : 0;
+            var endTime = eventdata['xaxis.range[1]'] != undefined ? moment(eventdata['xaxis.range[1]']) : 0;
+            logger.debug("Graph relayout:");
+            logger.debug("start_time " + startTime);
 
-            tableDiv.innerHTML = getTable(resized_graph_data);
+            tableDiv.innerHTML = getTable( computeData( graph_data[name].data_entries, config.pivot, startTime, endTime ), name );
+
+            //tell the main process we have finished.
+            ipcRenderer.send('resising-finished');
             
         });
 
 
     //todo: how to resize now?
-    //window.addEventListener('resize', function() { Plotly.Plots.resize(gd); });
-    tableDiv.innerHTML = getTable(graph_data[name]);
+    window.addEventListener('resize', function() { Plotly.Plots.resize(myDiv); });
+    tableDiv.innerHTML = getTable(graph_data[name], name);
 }
 document.ondragover = function () {
     event.preventDefault();

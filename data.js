@@ -39,6 +39,8 @@ var processDataEntry = function(data_entries, temperature, humidity, time, dew_p
 
 var computeData = function(data_entries, pivot, startTime = 0, endTime = 0) {
 
+    logger.info("ComputeData with pivot", pivot);
+    console.log("ComputeData with pivot", pivot);
     var data_dict = initialise_data_dict();
     data_dict.data_entries = data_entries;
     var startIndex = 0;
@@ -91,7 +93,7 @@ var computeData = function(data_entries, pivot, startTime = 0, endTime = 0) {
 
 
     for(var index = 0; index < reduced_data_dict.data_entries.length; index++) {
-        reduced_data_dict.time.push(reduced_data_dict.data_entries[index].currDate);
+        reduced_data_dict.time.push(reduced_data_dict.data_entries[index].currDate.format());
         reduced_data_dict.temperature.push(reduced_data_dict.data_entries[index].temperature);
         reduced_data_dict.humidity.push(reduced_data_dict.data_entries[index].humidity);
         reduced_data_dict.dew_point.push(reduced_data_dict.data_entries[index].dew_point);
@@ -115,6 +117,7 @@ var computeData = function(data_entries, pivot, startTime = 0, endTime = 0) {
     logger.debug("timeBelow " + reduced_data_dict.timeBelow);
     logger.debug("humidity_average " + reduced_data_dict.humidity_average);
     logger.debug("dew_point_average " + reduced_data_dict.dew_point_average);
+    logger.debug("sampleTime " + reduced_data_dict.sampleTime);
     logger.debug("sampleTime " + reduced_data_dict.sampleTime);
     reduced_data_dict.cooling_percentage = ((reduced_data_dict.timeCooling / reduced_data_dict.sampleTime) * 100).toFixed(2);
     reduced_data_dict.above_pivot_percentage = ((reduced_data_dict.timeAbove / reduced_data_dict.sampleTime) * 100).toFixed(2);

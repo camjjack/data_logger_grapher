@@ -13,6 +13,11 @@ const ipcMain = electron.ipcMain;
 var mainWindow = null;
 var settingsWindow = null;
 
+var printInProgress = false;
+
+var defaultBounds = { width: 1024, height: 768 };
+var currentBounds = defaultBounds;
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
@@ -22,9 +27,8 @@ app.on('window-all-closed', function() {
     app.quit();
   }
 });
-
-ipcMain.on('print-page', function() {
-    mainWindow.webContents.printToPDF({ landscape: true}, function(error, data) {
+var printPage = function() {
+    mainWindow.webContents.printToPDF({ pageSize: 'A3', landscape: true}, function(error, data) {
         if (error) throw error;
         var file = dialog.showSaveDialog(mainWindow, { filters: [ { name: 'PDF', extensions: ['pdf'] }]});
         if(file) {
@@ -35,6 +39,33 @@ ipcMain.on('print-page', function() {
             });
         }
     });
+}
+
+ipcMain.on('resising-finished', function() {
+    console.log('resizing finished');
+    if(printInProgress) {
+        printPage();
+        printInProgress = false;
+        console.log('resizing back to', currentBounds);
+        mainWindow.setBounds( currentBounds );
+    }
+});
+
+ipcMain.on('print-page', function() {
+    printInProgress = true;
+    currentBounds = mainWindow.getBounds();
+    console.log('current size', currentBounds);
+    if(currentBounds.width == defaultBounds.width && currentBounds.height == defaultBounds.height) {
+        printPage();
+        printInProgress = false;
+    }
+    else {
+        //resize to fit on page and print once graph etc has finished resising.
+        defaultBounds.x = currentBounds.x;
+        defaultBounds.y = currentBounds.y;
+        console.log('resizing to', defaultBounds);
+        mainWindow.setBounds( defaultBounds );
+    }
 });
 
 ipcMain.on('open-settings-window', function () {
@@ -71,7 +102,7 @@ ipcMain.on('close-settings-window', function (event, config) {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1024, height: 768 });
+  mainWindow = new BrowserWindow( defaultBounds );
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/index.html');
