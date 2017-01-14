@@ -1,4 +1,5 @@
 const settings = require('electron-settings');
+const logger = require('winston');
 
 settings.defaults({
     'config' :{
@@ -15,12 +16,12 @@ if(!settings.hasSync('config')) {
 }
 var config = settings.getSync('config');
 
-console.log("config");
-console.log(config);
+logger.debug("config");
+logger.debug(config);
 
 var save = function(c){
-    console.log("saving config: ");
-    console.log(c);
+    logger.debug("saving config: ");
+    logger.debug(c);
     settings.setSync('config', c);
 }
 module.exports = {

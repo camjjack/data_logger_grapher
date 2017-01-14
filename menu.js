@@ -3,6 +3,7 @@ const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = require('electron').remote.BrowserWindow;
+const logger = require('winston');
 
 var menuTemplate = [{
     label: 'File',
@@ -37,18 +38,8 @@ var menuTemplate = [{
         label: 'Settings',
         accelerator: 'CmdOrCtrl+S',
         click: function () {
-            console.log('opening window');
+            logger.info('opening window');
             ipcRenderer.send('open-settings-window');
-            /*
-
-            var win = new BrowserWindow({ width: 800, height: 600, autoHideMenuBar: true });
-            win.on('closed', function() {
-              win = null;
-            });
-
-            win.loadURL('file://' + __dirname + '/settings.html');
-            win.webContents.openDevTools();
-            win.show();*/
         }
     }]
 }

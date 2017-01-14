@@ -1,26 +1,23 @@
 const electron = require('electron');
-var fs = require('fs');
-const importFile = require( './import.js' );
-var importExcel = importFile.importExcel;
-var importCSV = importFile.importCSV;
+var {importExcel, importCSV} = require( './import.js' );
+var {computeData} = require( './utils.js' );
+const logger = require('./log.js');
 
 const remote = electron.remote;
-const dialog = electron.remote.dialog;
 const Menu = remote.Menu;
-const MenuItem = remote.MenuItem;
 const menu = require('./menu.js');
-var configuration = require('./configuration.js');
-var config = configuration.config;
+var {config} = require('./configuration.js');
+var moment = require('moment');
 const ipcRenderer = electron.ipcRenderer;
 
 Menu.setApplicationMenu(Menu.buildFromTemplate(menu.menuTemplate));
+
 
 var graph_data = {};
 var first_file = {};
 var second_file = {};
 
-var getTable = function(name) {
-    var data_dict = graph_data[name];
+var getTable = function(data_dict, start, end) {
     var s = "<table class='striped'><thead><tr><th data-field='item' colspan='2' class='center-align'>" + name + "</th></tr></thead><tbody>";
     s += "<tr><th>Sample time</th><td>" + data_dict.sampleTime / 60000 + " minutes</td></tr>";
     s += "<tr><th>% time spent cooling</th><td>" + data_dict.cooling_percentage + "%</td></tr>";
@@ -36,16 +33,16 @@ var getTable = function(name) {
     return s;
 }
 var processFile = function(file, graphDivName, tableDiv) {
-    console.log('file ' + file.path);
+    logger.log('info', 'ProcessFile: ' + file.path);
 
     if(file.name.endsWith('.xlsx')) {
-       importExcel(file.path, config.max_temp, config.min_temp, config.pivot).then(function(xlsx_data_dict) {
-            graph_data[file.name] = xlsx_data_dict;
+       importExcel(file.path, config.max_temp, config.min_temp, config.pivot).then(function(xlstime_dict) {
+            graph_data[file.name] = xlstime_dict;
             doGraph(file.name, graphDivName, tableDiv);
        }, function(error) {
            
            Materialize.toast(error, 10000);
-           console.error("Failed to import csv", error);
+           logger.log('error', "Failed to import csv" + error);
        })
     }
     else {
@@ -54,7 +51,7 @@ var processFile = function(file, graphDivName, tableDiv) {
             doGraph(file.name, graphDivName, tableDiv);
        }, function(error) {
            Materialize.toast(error, 10000);
-           console.error("Failed to import csv", error);
+           logger.log('error', "Failed to import csv", error);
        })
     }
 }
@@ -66,22 +63,23 @@ var doGraph = function(name, graphDivName, tableDiv) {
       title: name.split(".")[0],
       xaxis: {
         showgrid: false,                  // remove the x-axis grid lines
+        rangeselector: {},
       }
     };
 
     if(config.display_temp) {
-        console.log("graphing with temp");
+        logger.info("graphing with temp");
         data.push({
-            x: graph_data[name].x_data,
-            y: graph_data[name].y_data,
+            x: graph_data[name].time,
+            y: graph_data[name].temperature,
             name: 'temperature',
         });
         layout.yaxis = { title: "Temperature"};
     }
     if(config.display_humidity) {
-        console.log("graphing with humidity");
+        logger.info("graphing with humidity");
         data.push({
-            x: graph_data[name].x_data,
+            x: graph_data[name].time,
             y: graph_data[name].humidity,
             name: 'humidity'
         });
@@ -96,13 +94,45 @@ var doGraph = function(name, graphDivName, tableDiv) {
             };
         }
     }
-    console.log("data " + data[0]);
-    var d3 = Plotly.d3;
+    logger.info("data " + data[0]);
+    /*
+    var d3 = Plotly.d3,
     var gd3 = d3.select("div[id='" + graphDivName + "']");
     var gd = gd3.node();
     Plotly.newPlot(gd, data, layout);
-    window.addEventListener('resize', function() { Plotly.Plots.resize(gd); });
-    tableDiv.innerHTML = getTable(name);
+    */
+
+        var myDiv = document.getElementById('graph1');
+
+    var d3 = Plotly.d3;
+        
+
+    Plotly.plot(myDiv, data, layout);
+
+    myDiv.on('plotly_relayout',
+        function(eventdata){  
+            var startTime = 0;
+            var endTime = 0;
+            logger.debug("start_time " + eventdata['xaxis.range[0]']);
+            logger.debug("end_time " + eventdata['xaxis.range[1]']);
+            // set the date range to be recalculated for the table data.
+            if( eventdata['xaxis.range[0]'] != undefined ) {
+               startTime = moment(eventdata['xaxis.range[0]']);
+            }
+            
+            if( eventdata['xaxis.range[1]'] != undefined ) {
+                endTime = moment(eventdata['xaxis.range[1]']);
+            }
+            var resized_graph_data = computeData(graph_data[name].data_entries, startTime, endTime);
+
+            tableDiv.innerHTML = getTable(resized_graph_data);
+            
+        });
+
+
+    //todo: how to resize now?
+    //window.addEventListener('resize', function() { Plotly.Plots.resize(gd); });
+    tableDiv.innerHTML = getTable(graph_data[name]);
 }
 document.ondragover = function () {
     event.preventDefault();
@@ -146,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     ipcRenderer.on('reprocess', function(event, c) {
         config = c;
-        console.log('received reprocess');
+        logger.info('received reprocess request from main');
         if(first_file.path) {
             processFile(first_file, 'graph1', first);
         }

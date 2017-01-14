@@ -5,6 +5,7 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const globalShortcut = electron.globalShortcut;
 const dialog = require('electron').dialog;
 const fs = require('fs');
+const logger = require('winston');
 const ipcMain = electron.ipcMain;
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -30,7 +31,7 @@ ipcMain.on('print-page', function() {
             fs.writeFile(file, data, function(error) {
               if (error)
                 throw error;
-              console.log("Write PDF successfully.");
+              logger.info("Wrote PDF successfully.");
             });
         }
     });
@@ -57,9 +58,9 @@ ipcMain.on('open-settings-window', function () {
 });
 
 ipcMain.on('close-settings-window', function (event, config) {
-        console.log('close-settings-window');
+        logger.info('close-settings-window');
     if (settingsWindow) {
-            console.log('settingsWindow closed');
+            logger.info('settingsWindow closed');
             var webContents = mainWindow.webContents;
             webContents.send('reprocess', config);
             settingsWindow.close();

@@ -1,5 +1,4 @@
 const electron = require('electron');
-const remote = electron.remote;
 const configuration = require('./configuration.js');
 const ipcRenderer = electron.ipcRenderer;
 var config = configuration.config;
