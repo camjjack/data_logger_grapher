@@ -28,10 +28,12 @@ var processDataEntry = function (dataEntries, temperature, humidity, time, dewPo
   data.dewPoint = dewPoint
 
   if (data.temperature < maxTemp && data.temperature > minTemp) {
-    // todo better name
-    data.currDate = formatDate(time)
-    data.timeStep = dataEntries.length ? data.currDate.diff(dataEntries[dataEntries.length - 1].currDate) : 0
+    data.date = formatDate(time)
+    data.timeStep = dataEntries.length ? data.date.diff(dataEntries[dataEntries.length - 1].date) : 0
+    console.debug('Adding data to dataEntries')
     dataEntries.push(data)
+  } else {
+    console.debug('Skipping data entry')
   }
   return dataEntries
 }
@@ -52,8 +54,8 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
     // find the first entry to process
     logger.info('Trimming data range to start at: ' + startTime)
     for (var index = 0; index < dataDict.dataEntries.length; index++) {
-      if (startTime.isBefore(dataDict.dataEntries[index].currDate)) {
-        logger.info('Starting at index ' + index + ', time: ' + dataDict.dataEntries[index].currDate)
+      if (startTime.isBefore(dataDict.dataEntries[index].date)) {
+        logger.info('Starting at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
         startIndex = index
         break
       }
@@ -63,8 +65,8 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
     // find the first entry to process
     logger.info('Trimming data range to end at: ' + endTime)
     for (index = 0; index < dataDict.dataEntries.length; index++) {
-      if (endTime.isBefore(dataDict.dataEntries[index].currDate)) {
-        logger.info('Ending at index ' + index + ', time: ' + dataDict.dataEntries[index].currDate)
+      if (endTime.isBefore(dataDict.dataEntries[index].date)) {
+        logger.info('Ending at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
         endIndex = index
         break
       }
@@ -74,9 +76,9 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
 
   // recalulate above/below if pivot changed.
   logger.debug('length ' + reducedDataDict.dataEntries.length)
-  logger.debug('Ending at ' + reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].currDate)
-  logger.debug('starting at ' + reducedDataDict.dataEntries[0].currDate)
-  reducedDataDict.sampleTime = reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].currDate.diff(reducedDataDict.dataEntries[0].currDate)
+  logger.debug('Ending at ' + reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date)
+  logger.debug('starting at ' + reducedDataDict.dataEntries[0].date)
+  reducedDataDict.sampleTime = reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date.diff(reducedDataDict.dataEntries[0].date)
   reducedDataDict.timeCooling = 0
   reducedDataDict.timeAbove = 0
   reducedDataDict.timeBelow = 0
@@ -86,7 +88,7 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   reducedDataDict.temperature = []
 
   for (index = 0; index < reducedDataDict.dataEntries.length; index++) {
-    reducedDataDict.time.push(reducedDataDict.dataEntries[index].currDate.format())
+    reducedDataDict.time.push(reducedDataDict.dataEntries[index].date.format())
     reducedDataDict.temperature.push(reducedDataDict.dataEntries[index].temperature)
     reducedDataDict.humidity.push(reducedDataDict.dataEntries[index].humidity)
     reducedDataDict.dewPoint.push(reducedDataDict.dataEntries[index].dewPoint)

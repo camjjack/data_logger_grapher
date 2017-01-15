@@ -24,7 +24,7 @@ function saveConfig () {
   ipcRenderer.send('close-settings-window', config)
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   var pivot = document.getElementById('pivot')
   pivot.value = config.pivot
 

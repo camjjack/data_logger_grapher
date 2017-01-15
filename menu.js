@@ -9,25 +9,25 @@ var menuTemplate = [{
   submenu: [{
     label: 'Reload',
     accelerator: 'CmdOrCtrl+R',
-    click: function () {
+    click: () => {
       BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache()
     }
   }, {
     label: 'Toggle DevTools',
     accelerator: 'Alt+CmdOrCtrl+I',
-    click: function () {
+    click: () => {
       BrowserWindow.getFocusedWindow().toggleDevTools()
     }
   }, {
     label: 'Print',
     accelerator: 'CmdOrCtrl+P',
-    click: function () {
+    click: () => {
       ipcRenderer.send('print-page')
     }
   }, {
     label: 'Quit',
     accelerator: 'CmdOrCtrl+Q',
-    click: function () {
+    click: () => {
       app.quit()
     }
   }]
@@ -36,7 +36,7 @@ var menuTemplate = [{
   submenu: [{
     label: 'Settings',
     accelerator: 'CmdOrCtrl+S',
-    click: function () {
+    click: () => {
       logger.info('opening window')
       ipcRenderer.send('open-settings-window')
     }

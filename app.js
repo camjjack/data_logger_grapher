@@ -37,19 +37,19 @@ var processFile = function (file, graphDivName, tableDiv) {
   logger.log('info', 'ProcessFile: ' + file.path)
 
   if (file.name.endsWith('.xlsx')) {
-    importExcel(file.path, config.maxTemp, config.minTemp, config.pivot).then(function (xlsxDict) {
+    importExcel(file.path, config.maxTemp, config.minTemp, config.pivot).then((xlsxDict) => {
       graphData[file.name] = xlsxDict
       doGraph(file.name, graphDivName, tableDiv)
-    }, function (error) {
+    }, (error) => {
       Materialize.toast(error, 10000)
       logger.log('error', 'Failed to import csv ' + error)
     })
   } else {
-    importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then(function (csvDataDict) {
+    importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
       graphData[file.name] = csvDataDict
       console.log(graphData[file.name])
       doGraph(file.name, graphDivName, tableDiv)
-    }, function (error) {
+    }, (error) => {
       Materialize.toast(error, 10000)
       logger.log('error', 'Failed to import csv', error)
     })
@@ -98,7 +98,7 @@ var doGraph = function (name, graphDivName, tableDiv) {
   Plotly.newPlot(myDiv, data, layout)
 
   myDiv.on('plotly_relayout',
-    function (eventdata) {
+    (eventdata) => {
       var startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
       var endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
       logger.debug('Graph relayout:')
@@ -111,44 +111,44 @@ var doGraph = function (name, graphDivName, tableDiv) {
     }
   )
 
-  window.addEventListener('resize', function () { Plotly.Plots.resize(myDiv) })
+  window.addEventListener('resize', () => { Plotly.Plots.resize(myDiv) })
   tableDiv.innerHTML = getTable(graphData[name], name)
 }
 
-document.ondragover = function (event) {
+document.ondragover = (event) => {
   event.preventDefault()
   return false
 }
 
-document.ondrop = function (event) {
+document.ondrop = (event) => {
   event.preventDefault()
   return false
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   var first = document.getElementById('first')
   var second = document.getElementById('second')
-  first.ondragover = function () {
+  first.ondragover = () => {
     return false
   }
-  first.ondragleave = first.ondragend = function () {
+  first.ondragleave = first.ondragend = () => {
     return false
   }
 
-  first.ondrop = function (e) {
+  first.ondrop = (e) => {
     e.preventDefault()
     var file = e.dataTransfer.files[0]
     firstFile = {path: file.path, name: file.name}
     processFile(firstFile, 'graph1', first)
     return false
   }
-  second.ondragover = function () {
+  second.ondragover = () => {
     return false
   }
-  second.ondragleave = second.ondragend = function () {
+  second.ondragleave = second.ondragend = () => {
     return false
   }
-  second.ondrop = function (e) {
+  second.ondrop = (e) => {
     e.preventDefault()
     var file = e.dataTransfer.files[0]
     secondFile = {path: file.path, name: file.name}
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return false
   }
 
-  ipcRenderer.on('reprocess', function (event, c) {
+  ipcRenderer.on('reprocess', (event, c) => {
     config = c
     logger.info('received reprocess request from main')
     if (firstFile.path) {

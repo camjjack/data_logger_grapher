@@ -19,7 +19,7 @@ var config = settings.getSync('config')
 logger.debug('config')
 logger.debug(config)
 
-var save = function (c) {
+var save = (c) => {
   logger.debug('saving config: ')
   logger.debug(c)
   settings.setSync('config', c)

@@ -21,9 +21,9 @@ describe('(unit) example suite', () => {
   })
 
   describe('Valid resize', () => {
-    it('1.txt', function (done) {
+    it('1.txt', (done) => {
       this.timeout(10000)
-      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then(function (csvDataDict) {
+      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then((csvDataDict) => {
         csvDataDict.cooling_percentage.should.equal((8.57).toFixed(2))
         csvDataDict.abovePivotPercentage.should.equal((99.85).toFixed(2))
         csvDataDict.belowPivotPercentage.should.equal((0.13).toFixed(2))
@@ -37,7 +37,7 @@ describe('(unit) example suite', () => {
         var resizedData = computeData(csvDataDict.dataEntries, 3, startTime, endTime)
         logger.info('resized sample time', resizedData.sampleTime)
 
-        importCSV(path.resolve(__dirname, 'data', '1-split.txt'), 10, -10, 3).then(function (preSplitDataDict) {
+        importCSV(path.resolve(__dirname, 'data', '1-split.txt'), 10, -10, 3).then((preSplitDataDict) => {
           preSplitDataDict.sampleTime.should.equal(resizedData.sampleTime)
           preSplitDataDict.cooling_percentage.should.equal(resizedData.cooling_percentage)
           preSplitDataDict.abovePivotPercentage.should.equal(resizedData.abovePivotPercentage)
@@ -47,11 +47,11 @@ describe('(unit) example suite', () => {
           preSplitDataDict.timeCooling.should.equal(resizedData.timeCooling)
           preSplitDataDict.sampleTime.should.equal(resizedData.sampleTime)
           done()
-        }, function (error) {
+        }, (error) => {
           logger.error('Failed to import csv', error)
           done(error)
         })
-      }, function (error) {
+      }, (error) => {
         logger.error('Failed to import csv', error)
         done(error)
       })
@@ -59,9 +59,9 @@ describe('(unit) example suite', () => {
   })
 
   describe('Valid resize and revert', () => {
-    it('1.txt', function (done) {
+    it('1.txt', (done) => {
       this.timeout(20000)
-      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then(function (csvDataDict) {
+      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then((csvDataDict) => {
         var startTime = moment('2015-09-05 03:20:30')
         var endTime = moment('2015-09-10 06:10:30')
         computeData(csvDataDict.dataEntries, 3, startTime, endTime)
@@ -77,7 +77,7 @@ describe('(unit) example suite', () => {
         fullDataDict.timeCooling.should.equal(csvDataDict.timeCooling)
         fullDataDict.sampleTime.should.equal(csvDataDict.sampleTime)
         done()
-      }, function (error) {
+      }, (error) => {
         logger.error('Failed to import csv', error)
         done(error)
       })

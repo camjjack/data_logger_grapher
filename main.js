@@ -17,7 +17,7 @@ var defaultBounds = { width: 1024, height: 768 }
 var currentBounds = defaultBounds
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   globalShortcut.unregisterAll()
@@ -26,13 +26,13 @@ app.on('window-all-closed', function () {
   }
 })
 var printPage = function () {
-  mainWindow.webContents.printToPDF({landscape: true}, function (error, data) {
+  mainWindow.webContents.printToPDF({landscape: true}, (error, data) => {
     if (error) {
       throw error
     }
     var file = dialog.showSaveDialog(mainWindow, {filters: [{name: 'PDF', extensions: ['pdf']}]})
     if (file) {
-      fs.writeFile(file, data, function (error) {
+      fs.writeFile(file, data, (error) => {
         if (error) {
           throw error
         }
@@ -42,7 +42,7 @@ var printPage = function () {
   })
 }
 
-ipcMain.on('resising-finished', function () {
+ipcMain.on('resising-finished', () => {
   console.log('resizing finished')
   if (printInProgress) {
     printPage()
@@ -52,7 +52,7 @@ ipcMain.on('resising-finished', function () {
   }
 })
 
-ipcMain.on('print-page', function () {
+ipcMain.on('print-page', () => {
   printInProgress = true
   currentBounds = mainWindow.getBounds()
   console.log('current size', currentBounds)
@@ -68,7 +68,7 @@ ipcMain.on('print-page', function () {
   }
 })
 
-ipcMain.on('open-settings-window', function () {
+ipcMain.on('open-settings-window', () => {
   if (settingsWindow) {
     return
   }
@@ -83,12 +83,12 @@ ipcMain.on('open-settings-window', function () {
   // settingsWindow.webContents.openDevTools()
   settingsWindow.show()
 
-  settingsWindow.on('closed', function () {
+  settingsWindow.on('closed', () => {
     settingsWindow = null
   })
 })
 
-ipcMain.on('close-settings-window', function (event, config) {
+ipcMain.on('close-settings-window', (event, config) => {
   logger.info('close-settings-window')
   if (settingsWindow) {
     logger.info('settingsWindow closed')
@@ -100,7 +100,7 @@ ipcMain.on('close-settings-window', function (event, config) {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function () {
+app.on('ready', () => {
   // Create the browser window.
   mainWindow = new BrowserWindow(defaultBounds)
 
@@ -111,7 +111,7 @@ app.on('ready', function () {
   // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
+  mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.

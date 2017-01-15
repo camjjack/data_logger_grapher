@@ -1,6 +1,8 @@
 #directories
 node_modules
 dist
+istanbul
+html-report
 
 #files
 *.log

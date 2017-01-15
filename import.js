@@ -13,7 +13,7 @@ var dewPointNames = ['dew point']
 var importExcel = function (filePath, maxTemp, minTemp, pivot) {
   var dataEntries = []
 
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     logger.info('Importing xlsx from ' + filePath)
     const extractor = new XlsxExtractor(filePath)
     const tasks = []
@@ -129,7 +129,7 @@ function validateHeaders (headers) {
 }
 
 var importCSV = function (filePath, maxTemp, minTemp, pivot) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     var headingsValidated = false
     var headingsValid = false
     var dataEntries = []
@@ -139,7 +139,7 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
 
     csv
     .fromPath(filePath, {headers: true, ignoreEmpty: true, discardUnmappedColumns: true})
-    .validate(function (rawData) {
+    .validate((rawData) => {
       if (headingsValidated === false) {
         try {
           headingsValidated = true
@@ -151,7 +151,7 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
       }
       return keys != null
     })
-    .on('data', function (rawData) {
+    .on('data', (rawData) => {
       var temperature = parseFloat(rawData[keys.temp])
       var humidity = keys.humidity !== -1 ? parseFloat(rawData[keys.humidity]) : NaN
       var time = rawData[keys.time]
@@ -160,7 +160,7 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
       dataEntries = processDataEntry(dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp)
       logger.debug('data entries length: ' + dataEntries.length)
     })
-    .on('end', function () {
+    .on('end', () => {
       if (keys) {
         logger.debug('data entries final length: ' + dataEntries.length)
         var dataDict = computeData(dataEntries, pivot)
@@ -178,9 +178,9 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
         }
       }
       // else: already rejected
-    }).on('data-invalid', function () {
+    }).on('data-invalid', () => {
       // ignore
-    }).on('error', function (error) {
+    }).on('error', (error) => {
       logger.error('Error importing CSV:' + error)
       reject(new Error('Error importing CSV'))
     })
