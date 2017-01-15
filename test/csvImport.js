@@ -10,17 +10,17 @@ var importCSV = importFile.importCSV
 
 describe('(unit) example suite', () => {
   // Before test suite
-  before((done) => {
+  before(function (done) {
     return done()
   })
 
   // Before each of the tests
-  beforeEach((done) => {
+  beforeEach(function (done) {
     return done()
   })
 
   describe('Valid csv', () => {
-    it('1.txt', (done) => {
+    it('1.txt', function (done) {
       this.timeout(30000)
       importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then((csvDataDict) => {
         csvDataDict.cooling_percentage.should.equal((8.57).toFixed(2))
@@ -36,7 +36,7 @@ describe('(unit) example suite', () => {
         done(error)
       })
     })
-    it('2.txt', (done) => {
+    it('2.txt', function (done) {
       this.timeout(30000)
       importCSV(path.resolve(__dirname, 'data', '2.txt'), 10, -10, 3).then((csvDataDict) => {
         csvDataDict.cooling_percentage.should.equal((3.89).toFixed(2))
@@ -52,7 +52,7 @@ describe('(unit) example suite', () => {
         done(error)
       })
     })
-    it('3.txt', (done) => {
+    it('3.txt', function (done) {
       this.timeout(30000)
       importCSV(path.resolve(__dirname, 'data', '3.txt'), 10, -10, 3).then((csvDataDict) => {
         csvDataDict.cooling_percentage.should.equal((3.37).toFixed(2))
@@ -68,7 +68,7 @@ describe('(unit) example suite', () => {
         done(error)
       })
     })
-    it('5 - renamed headings', (done) => {
+    it('5 - renamed headings', function (done) {
       this.timeout(30000)
       importCSV(path.resolve(__dirname, 'data', '5.csv'), 10, -10, 3).then((csvDataDict) => {
         importCSV(path.resolve(__dirname, 'data', '5_renamed_headings.csv'), 10, -10, 3).then((renamedDataDict) => {
@@ -91,12 +91,12 @@ describe('(unit) example suite', () => {
   })
 
   describe('Invalid csv', () => {
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(3000)
       importCSV(path.resolve(__dirname, 'data', '4.xlsx'), 10, -10, 3).should.be.rejected
       done()
     })
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(3000)
       importCSV(path.resolve(__dirname, 'data', '5_no_temperature.csv'), 10, -10, 3).should.be.rejected
       done()
@@ -104,7 +104,7 @@ describe('(unit) example suite', () => {
   })
 
   describe('No Humidity', () => {
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(30000)
       importCSV(path.resolve(__dirname, 'data', '5_no_humidity.csv'), 10, -25, -15).then((humDataDict) => {
         humDataDict.cooling_percentage.should.equal((8.86).toFixed(2))
@@ -123,12 +123,12 @@ describe('(unit) example suite', () => {
   })
 
   // After each of the tests
-  afterEach((done) => {
+  afterEach(function (done) {
     done()
   })
 
   // At the end of all
-  after((done) => {
+  after(function (done) {
     done()
   })
 })

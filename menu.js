@@ -4,7 +4,7 @@ const app = electron.app  // Module to control application life.
 const BrowserWindow = require('electron').remote.BrowserWindow
 const logger = require('winston')
 
-var menuTemplate = [{
+let menuTemplate = [{
   label: 'File',
   submenu: [{
     label: 'Reload',

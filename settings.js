@@ -2,22 +2,22 @@
 const electron = require('electron')
 const configuration = require('./configuration.js')
 const ipcRenderer = electron.ipcRenderer
-var config = configuration.config
-var save = configuration.save
+let config = configuration.config
+let save = configuration.save
 
 function saveConfig () {
-  var pivot = document.getElementById('pivot')
+  let pivot = document.getElementById('pivot')
   config.pivot = pivot.value
 
-  var slider = document.getElementById('range')
-  var range = slider.noUiSlider.get()
+  let slider = document.getElementById('range')
+  let range = slider.noUiSlider.get()
   config.minTemp = parseInt(range[0])
   config.maxTemp = parseInt(range[1])
 
-  var temperature = document.getElementById('temperature')
+  let temperature = document.getElementById('temperature')
   config.displayTemp = temperature.checked
 
-  var humitity = document.getElementById('humitity')
+  let humitity = document.getElementById('humitity')
   config.displayHumidity = humitity.checked
   save(config)
 
@@ -25,10 +25,10 @@ function saveConfig () {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  var pivot = document.getElementById('pivot')
+  let pivot = document.getElementById('pivot')
   pivot.value = config.pivot
 
-  var slider = document.getElementById('range')
+  let slider = document.getElementById('range')
   noUiSlider.create(slider, {
     start: [config.minTemp, config.maxTemp],
     connect: true,
@@ -42,10 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
 
-  var temperature = document.getElementById('temperature')
+  let temperature = document.getElementById('temperature')
   temperature.checked = config.displayTemp
 
-  var humitity = document.getElementById('humitity')
+  let humitity = document.getElementById('humitity')
   humitity.checked = config.displayHumidity
 })
 

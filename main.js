@@ -10,11 +10,11 @@ const ipcMain = electron.ipcMain
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null
-var settingsWindow = null
-var printInProgress = false
-var defaultBounds = { width: 1024, height: 768 }
-var currentBounds = defaultBounds
+let mainWindow = null
+let settingsWindow = null
+let printInProgress = false
+let defaultBounds = { width: 1024, height: 768 }
+let currentBounds = defaultBounds
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -25,12 +25,12 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-var printPage = function () {
+let printPage = function () {
   mainWindow.webContents.printToPDF({landscape: true}, (error, data) => {
     if (error) {
       throw error
     }
-    var file = dialog.showSaveDialog(mainWindow, {filters: [{name: 'PDF', extensions: ['pdf']}]})
+    let file = dialog.showSaveDialog(mainWindow, {filters: [{name: 'PDF', extensions: ['pdf']}]})
     if (file) {
       fs.writeFile(file, data, (error) => {
         if (error) {
@@ -92,7 +92,7 @@ ipcMain.on('close-settings-window', (event, config) => {
   logger.info('close-settings-window')
   if (settingsWindow) {
     logger.info('settingsWindow closed')
-    var webContents = mainWindow.webContents
+    let webContents = mainWindow.webContents
     webContents.send('reprocess', config)
     settingsWindow.close()
   }

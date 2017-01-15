@@ -1,4 +1,4 @@
-var logger = require('winston')
+let logger = require('winston')
 
 logger.add(logger.transports.File, {filename: 'somefile.log', level: 'debug'})
 

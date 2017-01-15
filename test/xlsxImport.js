@@ -11,17 +11,17 @@ var importExcel = importFile.importExcel
 
 describe('(unit) example suite', () => {
   // Before test suite
-  before((done) => {
+  before(function (done) {
     return done()
   })
 
   // Before each of the tests
-  beforeEach((done) => {
+  beforeEach(function (done) {
     return done()
   })
 
   describe('Valid xlsx', () => {
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(30000)
       importExcel(path.resolve(__dirname, 'data', '4.xlsx'), 10, -25, -15).then((xlsxDict) => {
         xlsxDict.cooling_percentage.should.equal((3.89).toFixed(2))
@@ -37,7 +37,7 @@ describe('(unit) example suite', () => {
         done(error)
       })
     })
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(30000)
       importExcel(path.resolve(__dirname, 'data', '6.xlsx'), 10, -10, 3).then((xlsxDict) => {
         xlsxDict.cooling_percentage.should.equal((3.94).toFixed(2))
@@ -56,7 +56,7 @@ describe('(unit) example suite', () => {
   })
 
   describe('Comparisons', () => {
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       this.timeout(30000)
       importExcel(path.resolve(__dirname, 'data', '4.xlsx'), 10, -10, 3).then((xlsxDict) => {
         importCSV(path.resolve(__dirname, 'data', '4.csv'), 10, -10, 3).then((csvDataDict) => {
@@ -79,19 +79,19 @@ describe('(unit) example suite', () => {
   })
 
   describe('Invalid  xlsx', () => {
-    it('should pass', (done) => {
+    it('should pass', function (done) {
       importExcel(path.resolve(__dirname, 'data', '4.csv'), 10, -10, 3).should.be.rejected
       done()
     })
   })
 
   // After each of the tests
-  afterEach((done) => {
+  afterEach(function (done) {
     done()
   })
 
   // At the end of all
-  after((done) => {
+  after(function (done) {
     done()
   })
 })

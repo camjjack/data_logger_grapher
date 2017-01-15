@@ -14,12 +14,12 @@ settings.defaults({
 if (!settings.hasSync('config')) {
   settings.resetToDefaultsSync()
 }
-var config = settings.getSync('config')
+let config = settings.getSync('config')
 
 logger.debug('config')
 logger.debug(config)
 
-var save = (c) => {
+let save = (c) => {
   logger.debug('saving config: ')
   logger.debug(c)
   settings.setSync('config', c)

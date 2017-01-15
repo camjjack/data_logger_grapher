@@ -1,17 +1,17 @@
-var csv = require('fast-csv')
-var {matchInStringArray} = require('./utils.js')
-var {processDataEntry, computeData} = require('./data.js')
+let csv = require('fast-csv')
+let {matchInStringArray} = require('./utils.js')
+let {processDataEntry, computeData} = require('./data.js')
 const logger = require('winston')
 const XlsxExtractor = require('xlsx-extractor')
 
 // todo. make these settings.
-var tempNames = ['celsius', 'temp']
-var humidityNames = ['hum']
-var timeNames = ['time', 'date']
-var dewPointNames = ['dew point']
+let tempNames = ['celsius', 'temp']
+let humidityNames = ['hum']
+let timeNames = ['time', 'date']
+let dewPointNames = ['dew point']
 
-var importExcel = function (filePath, maxTemp, minTemp, pivot) {
-  var dataEntries = []
+let importExcel = function (filePath, maxTemp, minTemp, pivot) {
+  let dataEntries = []
 
   return new Promise((resolve, reject) => {
     logger.info('Importing xlsx from ' + filePath)
@@ -20,15 +20,15 @@ var importExcel = function (filePath, maxTemp, minTemp, pivot) {
     for (let i = 1, max = extractor.count; i <= max; ++i) {
       tasks.push(extractor.extract(i))
     }
-    var temperatureCell = -1
-    var humidityCell = -1
-    var timeCell = -1
-    var dewPointCell = -1
+    let temperatureCell = -1
+    let humidityCell = -1
+    let timeCell = -1
+    let dewPointCell = -1
 
     Promise
     .all(tasks)
     .then((results) => {
-      for (var i = 0; i < results[0].cells[0].length; i++) {
+      for (let i = 0; i < results[0].cells[0].length; i++) {
         if (matchInStringArray(results[0].cells[0][i], tempNames)) {
           temperatureCell = i
           logger.debug('temperatureCell = ' + i)
@@ -53,21 +53,21 @@ var importExcel = function (filePath, maxTemp, minTemp, pivot) {
         reject(Error('Data import Error. Couldn\'t find time/date column in file'))
       }
 
-      for (i = 1; i < results[0].cells.length; i++) {
-        var temperature = parseFloat(results[0].cells[i][temperatureCell])
-        var v = results[0].cells[i][timeCell]
-        var date = (v | 0)
-        var time = Math.floor(86400 * (v - date))
-        var dow = 0
-        var dout = []
-        var out = { D: date, T: time, u: 86400 * (v - date) - time, y: 0, m: 0, d: 0, H: 0, M: 0, S: 0, q: 0 }
+      for (let i = 1; i < results[0].cells.length; i++) {
+        let temperature = parseFloat(results[0].cells[i][temperatureCell])
+        let v = results[0].cells[i][timeCell]
+        let date = (v | 0)
+        let time = Math.floor(86400 * (v - date))
+        let dow = 0
+        let dout = []
+        let out = { D: date, T: time, u: 86400 * (v - date) - time, y: 0, m: 0, d: 0, H: 0, M: 0, S: 0, q: 0 }
         if (out.u > 0.999) {
           out.u = 0
           if (++time === 86400) { time = 0; ++date }
         }
         if (date > 60) --date
         /* 1 = Jan 1 1900 */
-        var d = new Date(1900, 0, 1)
+        let d = new Date(1900, 0, 1)
         d.setDate(d.getDate() + date - 1)
         dout = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
         dow = d.getDay()
@@ -77,13 +77,13 @@ var importExcel = function (filePath, maxTemp, minTemp, pivot) {
         out.M = time % 60; time = Math.floor(time / 60)
         out.H = time
         out.q = dow
-        var timeDate = new Date(out.y, out.m, out.d, out.H, out.M, out.S)
-        var humidity = parseFloat(results[0].cells[i][humidityCell])
-        var dewPoint = parseFloat(results[0].cells[i][dewPointCell])
+        let timeDate = new Date(out.y, out.m, out.d, out.H, out.M, out.S)
+        let humidity = parseFloat(results[0].cells[i][humidityCell])
+        let dewPoint = parseFloat(results[0].cells[i][dewPointCell])
         dataEntries = processDataEntry(dataEntries, temperature, humidity, timeDate, dewPoint, maxTemp, minTemp)
       }
 
-      var dataDict = computeData(dataEntries, pivot)
+      let dataDict = computeData(dataEntries, pivot)
       resolve(dataDict)
     })
     .catch((err) => {
@@ -94,14 +94,14 @@ var importExcel = function (filePath, maxTemp, minTemp, pivot) {
 }
 
 function validateHeaders (headers) {
-  var validatedKeys = {}
+  let validatedKeys = {}
   validatedKeys.temp = -1
   validatedKeys.humidity = -1
   validatedKeys.time = -1
   validatedKeys.dewPoint = -1
 
-  var headerKeys = Object.getOwnPropertyNames(headers)
-  for (var i = 0; i < headerKeys.length; i++) {
+  let headerKeys = Object.getOwnPropertyNames(headers)
+  for (let i = 0; i < headerKeys.length; i++) {
     if (validatedKeys.temp === -1) {
       validatedKeys.temp = matchInStringArray(headerKeys[i], tempNames) ? headerKeys[i] : -1
     }
@@ -128,12 +128,12 @@ function validateHeaders (headers) {
   return validatedKeys
 }
 
-var importCSV = function (filePath, maxTemp, minTemp, pivot) {
+let importCSV = function (filePath, maxTemp, minTemp, pivot) {
   return new Promise((resolve, reject) => {
-    var headingsValidated = false
-    var headingsValid = false
-    var dataEntries = []
-    var keys = null
+    let headingsValidated = false
+    let headingsValid = false
+    let dataEntries = []
+    let keys = null
 
     logger.info('Importing CSV from ' + filePath)
 
@@ -152,10 +152,10 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
       return keys != null
     })
     .on('data', (rawData) => {
-      var temperature = parseFloat(rawData[keys.temp])
-      var humidity = keys.humidity !== -1 ? parseFloat(rawData[keys.humidity]) : NaN
-      var time = rawData[keys.time]
-      var dewPoint = keys.dewPoint !== -1 ? parseFloat(rawData[keys.dewPoint]) : NaN
+      let temperature = parseFloat(rawData[keys.temp])
+      let humidity = keys.humidity !== -1 ? parseFloat(rawData[keys.humidity]) : NaN
+      let time = rawData[keys.time]
+      let dewPoint = keys.dewPoint !== -1 ? parseFloat(rawData[keys.dewPoint]) : NaN
 
       dataEntries = processDataEntry(dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp)
       logger.debug('data entries length: ' + dataEntries.length)
@@ -163,7 +163,7 @@ var importCSV = function (filePath, maxTemp, minTemp, pivot) {
     .on('end', () => {
       if (keys) {
         logger.debug('data entries final length: ' + dataEntries.length)
-        var dataDict = computeData(dataEntries, pivot)
+        let dataDict = computeData(dataEntries, pivot)
 
         if (keys.humidity === -1) {
           logger.debug('data entries after length: ' + dataDict.dataEntries.length)

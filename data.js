@@ -1,8 +1,8 @@
-var {formatDate, getAverageFromArray} = require('./utils.js')
+let {formatDate, getAverageFromArray} = require('./utils.js')
 const logger = require('winston')
 
-var initialiseDataDict = function () {
-  var dataDict = {}
+let initialiseDataDict = function () {
+  let dataDict = {}
 
   dataDict.time = []
   dataDict.temperature = []
@@ -16,13 +16,13 @@ var initialiseDataDict = function () {
   return dataDict
 }
 
-var sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
+let sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
   dataDict.dataEntries = dataDict.dataEntries.slice(startIndex, endIndex)
   return dataDict
 }
 
-var processDataEntry = function (dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp) {
-  var data = {}
+let processDataEntry = function (dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp) {
+  let data = {}
   data.temperature = temperature
   data.humidity = humidity
   data.dewPoint = dewPoint
@@ -30,21 +30,19 @@ var processDataEntry = function (dataEntries, temperature, humidity, time, dewPo
   if (data.temperature < maxTemp && data.temperature > minTemp) {
     data.date = formatDate(time)
     data.timeStep = dataEntries.length ? data.date.diff(dataEntries[dataEntries.length - 1].date) : 0
-    console.debug('Adding data to dataEntries')
     dataEntries.push(data)
   } else {
-    console.debug('Skipping data entry')
   }
   return dataEntries
 }
 
-var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
+let computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   logger.info('ComputeData with pivot', pivot)
   console.log('ComputeData with pivot', pivot)
-  var dataDict = initialiseDataDict()
+  let dataDict = initialiseDataDict()
   dataDict.dataEntries = dataEntries
-  var startIndex = 0
-  var endIndex = dataDict.dataEntries.length
+  let startIndex = 0
+  let endIndex = dataDict.dataEntries.length
 
   if (endIndex === 0) {
     logger.error('Wooh there, how did this happen?')
@@ -53,7 +51,7 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   if (startTime) {
     // find the first entry to process
     logger.info('Trimming data range to start at: ' + startTime)
-    for (var index = 0; index < dataDict.dataEntries.length; index++) {
+    for (let index = 0; index < dataDict.dataEntries.length; index++) {
       if (startTime.isBefore(dataDict.dataEntries[index].date)) {
         logger.info('Starting at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
         startIndex = index
@@ -64,7 +62,7 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   if (endTime) {
     // find the first entry to process
     logger.info('Trimming data range to end at: ' + endTime)
-    for (index = 0; index < dataDict.dataEntries.length; index++) {
+    for (let index = 0; index < dataDict.dataEntries.length; index++) {
       if (endTime.isBefore(dataDict.dataEntries[index].date)) {
         logger.info('Ending at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
         endIndex = index
@@ -72,7 +70,7 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
       }
     }
   }
-  var reducedDataDict = sliceDataDictArrays(dataDict, startIndex, endIndex)
+  let reducedDataDict = sliceDataDictArrays(dataDict, startIndex, endIndex)
 
   // recalulate above/below if pivot changed.
   logger.debug('length ' + reducedDataDict.dataEntries.length)
@@ -87,7 +85,7 @@ var computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   reducedDataDict.time = []
   reducedDataDict.temperature = []
 
-  for (index = 0; index < reducedDataDict.dataEntries.length; index++) {
+  for (let index = 0; index < reducedDataDict.dataEntries.length; index++) {
     reducedDataDict.time.push(reducedDataDict.dataEntries[index].date.format())
     reducedDataDict.temperature.push(reducedDataDict.dataEntries[index].temperature)
     reducedDataDict.humidity.push(reducedDataDict.dataEntries[index].humidity)

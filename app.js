@@ -1,24 +1,24 @@
 /* global Materialize, Plotly */
 const electron = require('electron')
-var {importExcel, importCSV} = require('./import.js')
-var {computeData} = require('./data.js')
+let {importExcel, importCSV} = require('./import.js')
+let {computeData} = require('./data.js')
 const logger = require('./log.js')
 
 const remote = electron.remote
 const Menu = remote.Menu
 const menu = require('./menu.js')
-var {config} = require('./configuration.js')
-var moment = require('moment')
+let {config} = require('./configuration.js')
+let moment = require('moment')
 const ipcRenderer = electron.ipcRenderer
 
 Menu.setApplicationMenu(Menu.buildFromTemplate(menu.menuTemplate))
 
-var graphData = {}
-var firstFile = {}
-var secondFile = {}
+let graphData = {}
+let firstFile = {}
+let secondFile = {}
 
-var getTable = function (dataDict, name) {
-  var s = '<table class="striped"><thead><tr><th data-field="item" colspan="2" class="center-align">' + name + '</th></tr></thead><tbody>'
+let getTable = function (dataDict, name) {
+  let s = '<table class="striped"><thead><tr><th data-field="item" colspan="2" class="center-align">' + name + '</th></tr></thead><tbody>'
   s += '<tr><th>Sample time</th><td>' + dataDict.sampleTime / 60000 + ' minutes</td></tr>'
   s += '<tr><th>% time spent cooling</th><td>' + dataDict.cooling_percentage + '%</td></tr>'
   s += '<tr><th>% time above ' + config.pivot + '&deg;C</th><td>' + dataDict.abovePivotPercentage + '%</td></tr>'
@@ -33,7 +33,7 @@ var getTable = function (dataDict, name) {
   return s
 }
 
-var processFile = function (file, graphDivName, tableDiv) {
+let processFile = function (file, graphDivName, tableDiv) {
   logger.log('info', 'ProcessFile: ' + file.path)
 
   if (file.name.endsWith('.xlsx')) {
@@ -56,9 +56,9 @@ var processFile = function (file, graphDivName, tableDiv) {
   }
 }
 
-var doGraph = function (name, graphDivName, tableDiv) {
-  var data = []
-  var layout = {
+let doGraph = function (name, graphDivName, tableDiv) {
+  let data = []
+  let layout = {
     title: name.split('.')[0],
     xaxis: {
       showgrid: false,                  // remove the x-axis grid lines
@@ -94,13 +94,13 @@ var doGraph = function (name, graphDivName, tableDiv) {
   }
   logger.info('data ' + data[0])
 
-  var myDiv = document.getElementById(graphDivName)
+  let myDiv = document.getElementById(graphDivName)
   Plotly.newPlot(myDiv, data, layout)
 
   myDiv.on('plotly_relayout',
     (eventdata) => {
-      var startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
-      var endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
+      let startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
+      let endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
       logger.debug('Graph relayout:')
       logger.debug('start_time ' + startTime)
 
@@ -126,8 +126,8 @@ document.ondrop = (event) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  var first = document.getElementById('first')
-  var second = document.getElementById('second')
+  let first = document.getElementById('first')
+  let second = document.getElementById('second')
   first.ondragover = () => {
     return false
   }
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   first.ondrop = (e) => {
     e.preventDefault()
-    var file = e.dataTransfer.files[0]
+    let file = e.dataTransfer.files[0]
     firstFile = {path: file.path, name: file.name}
     processFile(firstFile, 'graph1', first)
     return false
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   second.ondrop = (e) => {
     e.preventDefault()
-    var file = e.dataTransfer.files[0]
+    let file = e.dataTransfer.files[0]
     secondFile = {path: file.path, name: file.name}
     processFile(secondFile, 'graph2', second)
     return false
