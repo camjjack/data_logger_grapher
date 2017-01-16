@@ -1,7 +1,7 @@
 let moment = require('moment')
 const logger = require('winston')
 
-let formatDate = function (dateString) {
+let formatDate = (dateString) => {
   let x = moment(dateString, ['DD/MM/YYYY HH:mm', 'DD/MM/YYYY H:mm', 'YYYY-MM-DD HH:mm:ss'])
   if (!x.isValid()) {
     logger.debug('doing non dd/mm: ', dateString)
@@ -11,17 +11,16 @@ let formatDate = function (dateString) {
   return x
 }
 
-let getAverageFromArray = function (a) {
-  let sum = 0
-  for (let i = 0; i < a.length; i++) {
-    sum += parseInt(a[i], 10)
-  }
-  return (sum / a.length).toFixed(2)
+let getAverageFromArray = (arr, radix = 10, fractionDigits = 2) => {
+  let sum = arr.reduce((accumulator, currentValue) => {
+    return accumulator + parseInt(currentValue, radix)
+  }, 0)
+  return (sum / arr.length).toFixed(fractionDigits)
 }
 
-function matchInStringArray (item, stringArray) {
+let matchInStringArray = (item, stringArray, caseSensitive = true) => {
   for (let index in stringArray) {
-    if (item.toLowerCase().match(stringArray[index].toLowerCase())) {
+    if (item.match(new RegExp(stringArray[index], caseSensitive ? '' : 'i'))) {
       return true
     }
   }

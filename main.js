@@ -43,11 +43,9 @@ let printPage = function () {
 }
 
 ipcMain.on('resising-finished', () => {
-  console.log('resizing finished')
   if (printInProgress) {
     printPage()
     printInProgress = false
-    console.log('resizing back to', currentBounds)
     mainWindow.setBounds(currentBounds)
   }
 })
@@ -55,7 +53,6 @@ ipcMain.on('resising-finished', () => {
 ipcMain.on('print-page', () => {
   printInProgress = true
   currentBounds = mainWindow.getBounds()
-  console.log('current size', currentBounds)
   if (currentBounds.width === defaultBounds.width && currentBounds.height === defaultBounds.height) {
     printPage()
     printInProgress = false
@@ -63,7 +60,6 @@ ipcMain.on('print-page', () => {
     // resize to fit on page and print once graph etc has finished resising.
     defaultBounds.x = currentBounds.x
     defaultBounds.y = currentBounds.y
-    console.log('resizing to', defaultBounds)
     mainWindow.setBounds(defaultBounds)
   }
 })

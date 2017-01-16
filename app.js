@@ -47,7 +47,6 @@ let processFile = function (file, graphDivName, tableDiv) {
   } else {
     importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
       graphData[file.name] = csvDataDict
-      console.log(graphData[file.name])
       doGraph(file.name, graphDivName, tableDiv)
     }, (error) => {
       Materialize.toast(error, 10000)

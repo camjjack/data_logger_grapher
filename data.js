@@ -1,4 +1,4 @@
-let {formatDate, getAverageFromArray} = require('./utils.js')
+let {getAverageFromArray} = require('./utils.js')
 const logger = require('winston')
 
 let initialiseDataDict = function () {
@@ -21,14 +21,10 @@ let sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
   return dataDict
 }
 
-let processDataEntry = function (dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp) {
-  let data = {}
-  data.temperature = temperature
-  data.humidity = humidity
-  data.dewPoint = dewPoint
+let processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
+  let data = {temperature: temperature, humidity: humidity, dewPoint: dewPoint, date: date}
 
   if (data.temperature < maxTemp && data.temperature > minTemp) {
-    data.date = formatDate(time)
     data.timeStep = dataEntries.length ? data.date.diff(dataEntries[dataEntries.length - 1].date) : 0
     dataEntries.push(data)
   } else {
@@ -38,7 +34,6 @@ let processDataEntry = function (dataEntries, temperature, humidity, time, dewPo
 
 let computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   logger.info('ComputeData with pivot', pivot)
-  console.log('ComputeData with pivot', pivot)
   let dataDict = initialiseDataDict()
   dataDict.dataEntries = dataEntries
   let startIndex = 0
