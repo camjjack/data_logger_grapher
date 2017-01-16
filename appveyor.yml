@@ -29,11 +29,11 @@ build_script:
   - npm run dist
 
 test_script:
-  - npm run test
+  - npm run test -- --reporter mocha-appveyor-reporter
 
 artifacts:
   - path: dist\DataLoggerGrapher*.exe
-    name: DataLoggerGrapher.exe,
+    name: DataLoggerGrapher.exe
     
   - path: dist\latest.yml
     name: latest.yml
