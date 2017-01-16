@@ -36,10 +36,9 @@ let convertXlsxDate = (cellValue) => {
   return moment({year: out.y, month: out.m, day: out.d, hour: out.H, minute: out.M, second: out.S})
 }
 
-let importExcel = function (filePath, maxTemp, minTemp, pivot) {
-  let dataEntries = []
-
+let importExcel = function (filePath, maxTemp, minTemp, pivot, setProgress = () => {}) {
   return new Promise((resolve, reject) => {
+    let dataEntries = []
     logger.info('Importing xlsx from ' + filePath)
     const extractor = new XlsxExtractor(filePath)
     const tasks = []
@@ -56,6 +55,8 @@ let importExcel = function (filePath, maxTemp, minTemp, pivot) {
       }
 
       for (let i = 1; i < results[0].cells.length; i++) {
+        setProgress( 20 + (i / results[0].cells.length ) * 60) // 20% for loading, 20% for graph drawing. 60% for this loop, 20% for graph
+        
         let temperature = parseFloat(results[0].cells[i][validatedKeys.temp])
         if (isNaN(temperature)) {
           // This is likely the start of superfluous rows

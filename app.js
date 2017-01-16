@@ -17,33 +17,60 @@ let graphData = {}
 let firstFile = {}
 let secondFile = {}
 
+let preloaderSpinner  = `
+  <div class="row">
+    <div class="col s12 center">
+      <div class="preloader-wrapper active center-align">
+        <div class="spinner-layer spinner-red">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div>
+          <div class="gap-patch">
+            <div class="circle"></div>
+          </div>
+          <div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`
+
+let preloader = `
+  <div class="progress" style="width: 100%">
+    <div class="determinate" style="width: 0%"></div>
+  </div>`
+
 let getTable = function (dataDict, name) {
-  let s = '<table class="striped"><thead><tr><th data-field="item" colspan="2" class="center-align">' + name + '</th></tr></thead><tbody>'
-  s += '<tr><th>Sample time</th><td>' + dataDict.sampleTime / 60000 + ' minutes</td></tr>'
-  s += '<tr><th>% time spent cooling</th><td>' + dataDict.cooling_percentage + '%</td></tr>'
-  s += '<tr><th>% time above ' + config.pivot + '&deg;C</th><td>' + dataDict.abovePivotPercentage + '%</td></tr>'
-  s += '<tr><th>% time below ' + config.pivot + '&deg;C</th><td>' + dataDict.belowPivotPercentage + '%</td></tr>'
+  let s = `<table class="striped"><thead><tr><th data-field="item" colspan="2" class="center-align">${name}</th></tr></thead><tbody>
+    <tr><th>Sample time</th><td>${dataDict.sampleTime / 60000} minutes</td></tr>
+    <tr><th>% time spent cooling</th><td>${dataDict.cooling_percentage}%</td></tr>
+    <tr><th>% time above ${config.pivot}&deg;C</th><td>${dataDict.abovePivotPercentage}%</td></tr>
+    <tr><th>% time below ${config.pivot}&deg;C</th><td>${dataDict.belowPivotPercentage}%</td></tr>`
+
   if (!isNaN(dataDict.humidityAverage)) {
-    s += '<tr><th>Humidity average</th><td>' + dataDict.humidityAverage + '</td></tr>'
+    s += `<tr><th>Humidity average</th><td>${dataDict.humidityAverage}</td></tr>`
   }
   if (!isNaN(dataDict.dewPointAverage)) {
-    s += '<tr><th>Dew point average</th><td>' + dataDict.dewPointAverage + '&deg;C</td></tr>'
+    s += `<tr><th>Dew point average</th><td>${dataDict.dewPointAverage}&deg;C</td></tr>`
   }
   s += '</tbody></table>'
   return s
 }
 
-let processFile = function (file, graphDivName, tableDiv) {
-  logger.log('info', 'ProcessFile: ' + file.path)
-
+let processFile2 = function (file, graphDivName, tableDiv) {
+  let graphDiv = document.getElementById(graphDivName)
   if (file.name.endsWith('.xlsx')) {
-    importExcel(file.path, config.maxTemp, config.minTemp, config.pivot).then((xlsxDict) => {
-      graphData[file.name] = xlsxDict
-      doGraph(file.name, graphDivName, tableDiv)
-    }, (error) => {
-      Materialize.toast(error, 10000)
-      logger.log('error', 'Failed to import csv ' + error)
-    })
+  setTimeout(function() {
+      importExcel(file.path, config.maxTemp, config.minTemp, config.pivot, (progress) => { graphDiv.getElementsByClassName("determinate")[0].style.width = `${progress}%` }).then((xlsxDict) => {
+        graphData[file.name] = xlsxDict
+    console.log('info', 'got graph data: ')
+        doGraph(file.name, graphDivName, tableDiv)
+      }, (error) => {
+        Materialize.toast(error, 10000)
+        logger.log('error', 'Failed to import csv ' + error)
+      })
+    }, 500)
   } else {
     importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
       graphData[file.name] = csvDataDict
@@ -52,6 +79,38 @@ let processFile = function (file, graphDivName, tableDiv) {
       Materialize.toast(error, 10000)
       logger.log('error', 'Failed to import csv', error)
     })
+  }
+}
+
+let processFile = function (file, graphDivName, tableDiv) {
+  let graphDiv = document.getElementById(graphDivName)
+  graphDiv.innerHTML = preloader
+  let originalTableContent = tableDiv.innerHTML
+  tableDiv.innerHTML = preloaderSpinner
+   if (file.name.endsWith('.xlsx')) {
+    setTimeout(function() {
+      importExcel(file.path, config.maxTemp, config.minTemp, config.pivot, (progress) => { graphDiv.getElementsByClassName("determinate")[0].style.width = `${progress}%` }).then((xlsxDict) => {
+        graphData[file.name] = xlsxDict
+        doGraph(file.name, graphDivName, tableDiv)
+      }, (error) => {
+        graphDiv.innerHTML = ''
+        tableDiv.innerHTML = originalTableContent
+        Materialize.toast(error, 10000)
+        logger.log('error', 'Failed to import csv ' + error)
+      })
+    }, 500)
+  } else {
+    setTimeout(function() {
+      importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
+        graphData[file.name] = csvDataDict
+        doGraph(file.name, graphDivName, tableDiv)
+      }, (error) => {
+        graphDiv.innerHTML = ''
+        tableDiv.innerHTML = originalTableContent
+        Materialize.toast(error, 10000)
+        logger.log('error', 'Failed to import csv', error)
+      })
+    }, 500)
   }
 }
 
