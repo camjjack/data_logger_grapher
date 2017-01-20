@@ -17,7 +17,7 @@ let graphData = {}
 let firstFile = {}
 let secondFile = {}
 
-let preloaderSpinner  = `
+let preloaderSpinner = `
   <div class="row">
     <div class="col s12 center">
       <div class="preloader-wrapper active center-align">
@@ -58,38 +58,14 @@ let getTable = function (dataDict, name) {
   return s
 }
 
-let processFile2 = function (file, graphDivName, tableDiv) {
-  let graphDiv = document.getElementById(graphDivName)
-  if (file.name.endsWith('.xlsx')) {
-  setTimeout(function() {
-      importExcel(file.path, config.maxTemp, config.minTemp, config.pivot, (progress) => { graphDiv.getElementsByClassName("determinate")[0].style.width = `${progress}%` }).then((xlsxDict) => {
-        graphData[file.name] = xlsxDict
-    console.log('info', 'got graph data: ')
-        doGraph(file.name, graphDivName, tableDiv)
-      }, (error) => {
-        Materialize.toast(error, 10000)
-        logger.log('error', 'Failed to import csv ' + error)
-      })
-    }, 500)
-  } else {
-    importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
-      graphData[file.name] = csvDataDict
-      doGraph(file.name, graphDivName, tableDiv)
-    }, (error) => {
-      Materialize.toast(error, 10000)
-      logger.log('error', 'Failed to import csv', error)
-    })
-  }
-}
-
 let processFile = function (file, graphDivName, tableDiv) {
   let graphDiv = document.getElementById(graphDivName)
   graphDiv.innerHTML = preloader
   let originalTableContent = tableDiv.innerHTML
   tableDiv.innerHTML = preloaderSpinner
-   if (file.name.endsWith('.xlsx')) {
-    setTimeout(function() {
-      importExcel(file.path, config.maxTemp, config.minTemp, config.pivot, (progress) => { graphDiv.getElementsByClassName("determinate")[0].style.width = `${progress}%` }).then((xlsxDict) => {
+  if (file.name.endsWith('.xlsx')) {
+    setTimeout(function () {
+      importExcel(file.path, config.maxTemp, config.minTemp, config.pivot, (progress) => { graphDiv.getElementsByClassName('determinate')[0].style.width = `${progress}%` }).then((xlsxDict) => {
         graphData[file.name] = xlsxDict
         doGraph(file.name, graphDivName, tableDiv)
       }, (error) => {
@@ -100,7 +76,7 @@ let processFile = function (file, graphDivName, tableDiv) {
       })
     }, 500)
   } else {
-    setTimeout(function() {
+    setTimeout(function () {
       importCSV(file.path, config.maxTemp, config.minTemp, config.pivot).then((csvDataDict) => {
         graphData[file.name] = csvDataDict
         doGraph(file.name, graphDivName, tableDiv)
@@ -161,8 +137,11 @@ let doGraph = function (name, graphDivName, tableDiv) {
       let endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
       logger.debug('Graph relayout:')
       logger.debug('start_time ' + startTime)
-
-      tableDiv.innerHTML = getTable(computeData(graphData[name].dataEntries, config.pivot, startTime, endTime), name)
+      try {
+        tableDiv.innerHTML = getTable(computeData(graphData[name].dataEntries, config.pivot, startTime, endTime), name)
+      } catch (error) {
+        Materialize.toast(`Error: ${error}`)
+      }
 
       // tell the main process we have finished.
       ipcRenderer.send('resising-finished')

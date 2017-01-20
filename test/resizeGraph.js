@@ -2,10 +2,12 @@
 var logger = require('../log.js')
 const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
+var should = require('chai').should()
 var moment = require('moment')
 chai.use(chaiAsPromised)
 chai.should()
 const path = require('path')
+const testDataPath = require('./config.js').testDataPath
 var importCSV = require('../import.js').importCSV
 var computeData = require('../data.js').computeData
 
@@ -22,8 +24,8 @@ describe('(unit) example suite', () => {
 
   describe('Valid resize', () => {
     it('1.txt', function (done) {
-      this.timeout(10000)
-      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then((csvDataDict) => {
+      this.timeout(20000)
+      importCSV(path.join(testDataPath, '1.txt'), 10, -10, 3).then((csvDataDict) => {
         csvDataDict.cooling_percentage.should.equal((8.57).toFixed(2))
         csvDataDict.abovePivotPercentage.should.equal((99.85).toFixed(2))
         csvDataDict.belowPivotPercentage.should.equal((0.13).toFixed(2))
@@ -37,7 +39,7 @@ describe('(unit) example suite', () => {
         var resizedData = computeData(csvDataDict.dataEntries, 3, startTime, endTime)
         logger.info('resized sample time', resizedData.sampleTime)
 
-        importCSV(path.resolve(__dirname, 'data', '1-split.txt'), 10, -10, 3).then((preSplitDataDict) => {
+        importCSV(path.join(testDataPath, '1-split.txt'), 10, -10, 3).then((preSplitDataDict) => {
           preSplitDataDict.sampleTime.should.equal(resizedData.sampleTime)
           preSplitDataDict.cooling_percentage.should.equal(resizedData.cooling_percentage)
           preSplitDataDict.abovePivotPercentage.should.equal(resizedData.abovePivotPercentage)
@@ -61,7 +63,7 @@ describe('(unit) example suite', () => {
   describe('Valid resize and revert', () => {
     it('1.txt', function (done) {
       this.timeout(20000)
-      importCSV(path.resolve(__dirname, 'data', '1.txt'), 10, -10, 3).then((csvDataDict) => {
+      importCSV(path.join(testDataPath, '1.txt'), 10, -10, 3).then((csvDataDict) => {
         var startTime = moment('2015-09-05 03:20:30')
         var endTime = moment('2015-09-10 06:10:30')
         computeData(csvDataDict.dataEntries, 3, startTime, endTime)
@@ -81,6 +83,13 @@ describe('(unit) example suite', () => {
         logger.error('Failed to import csv', error)
         done(error)
       })
+    })
+  })
+
+  describe('Invalid resize', () => {
+    it('1.txt', function (done) {
+      should.Throw(() => { computeData([], 3) }, Error)
+      done()
     })
   })
 

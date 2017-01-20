@@ -6,6 +6,7 @@ chai.use(chaiAsPromised)
 chai.should()
 const path = require('path')
 const importFile = require('../import.js')
+const testDataPath = require('./config.js').testDataPath
 var importCSV = importFile.importCSV
 var importExcel = importFile.importExcel
 
@@ -21,9 +22,9 @@ describe('(unit) example suite', () => {
   })
 
   describe('Valid xlsx', () => {
-    it('should pass', function (done) {
+    it('4.xlsx', function (done) {
       this.timeout(30000)
-      importExcel(path.resolve(__dirname, 'data', '4.xlsx'), 10, -25, -15).then((xlsxDict) => {
+      importExcel(path.join(testDataPath, '4.xlsx'), 10, -25, -15).then((xlsxDict) => {
         xlsxDict.cooling_percentage.should.equal((3.89).toFixed(2))
         xlsxDict.abovePivotPercentage.should.equal((21.51).toFixed(2))
         xlsxDict.belowPivotPercentage.should.equal((72.52).toFixed(2))
@@ -37,9 +38,9 @@ describe('(unit) example suite', () => {
         done(error)
       })
     })
-    it('should pass', function (done) {
+    it('6.xlsx', function (done) {
       this.timeout(30000)
-      importExcel(path.resolve(__dirname, 'data', '6.xlsx'), 10, -10, 3).then((xlsxDict) => {
+      importExcel(path.join(testDataPath, '6.xlsx'), 10, -10, 3).then((xlsxDict) => {
         xlsxDict.cooling_percentage.should.equal((3.94).toFixed(2))
         xlsxDict.abovePivotPercentage.should.equal((26.38).toFixed(2))
         xlsxDict.belowPivotPercentage.should.equal((45.78).toFixed(2))
@@ -56,10 +57,13 @@ describe('(unit) example suite', () => {
   })
 
   describe('Comparisons', () => {
-    it('should pass', function (done) {
+    it('4 csv vs xlsx', function (done) {
       this.timeout(30000)
-      importExcel(path.resolve(__dirname, 'data', '4.xlsx'), 10, -10, 3).then((xlsxDict) => {
-        importCSV(path.resolve(__dirname, 'data', '4.csv'), 10, -10, 3).then((csvDataDict) => {
+      importExcel(path.join(testDataPath, '4.xlsx'), 10, -25, 3).then((xlsxDict) => {
+        importCSV(path.join(testDataPath, '4.csv'), 10, -25, 3).then((csvDataDict) => {
+          for (let i = 0; i < csvDataDict.dataEntries.length; i++) {
+            csvDataDict.dataEntries[i].date.format().should.equal(xlsxDict.dataEntries[i].date.format())
+          }
           csvDataDict.cooling_percentage.should.equal(xlsxDict.cooling_percentage)
           csvDataDict.abovePivotPercentage.should.equal(xlsxDict.abovePivotPercentage)
           csvDataDict.belowPivotPercentage.should.equal(xlsxDict.belowPivotPercentage)
@@ -80,7 +84,14 @@ describe('(unit) example suite', () => {
 
   describe('Invalid  xlsx', () => {
     it('should pass', function (done) {
-      importExcel(path.resolve(__dirname, 'data', '4.csv'), 10, -10, 3).should.be.rejected
+      importExcel(path.join(testDataPath, '4.csv'), 10, -10, 3).should.be.rejected
+      done()
+    })
+  })
+
+  describe('Invalid  headings', () => {
+    it('should pass', function (done) {
+      importExcel(path.join(testDataPath, '4-no-temperature-heading.xlsx'), 10, -10, 3).should.be.rejected
       done()
     })
   })

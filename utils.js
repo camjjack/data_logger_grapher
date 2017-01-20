@@ -27,8 +27,16 @@ let matchInStringArray = (item, stringArray, caseSensitive = true) => {
   return false
 }
 
+let fromOADate = function (msDate) {
+  var d = new Date(((msDate - 25569) * 86400000) + (msDate >= 0.0 ? 0.5 : -0.5))
+  var tz = d.getTimezoneOffset()
+  var jO = new Date(((msDate - 25569 + (tz / (60 * 24))) * 86400000) + (msDate >= 0.0 ? 0.5 : -0.5))
+  return moment(jO)
+}
+
 module.exports = {
   formatDate: formatDate,
   getAverageFromArray: getAverageFromArray,
-  matchInStringArray: matchInStringArray
+  matchInStringArray: matchInStringArray,
+  fromOADate: fromOADate
 }

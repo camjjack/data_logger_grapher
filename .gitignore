@@ -1,8 +1,7 @@
 #directories
 node_modules
 dist
-istanbul
-html-report
+coverage
 
 #files
 *.log

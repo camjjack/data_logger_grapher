@@ -1,0 +1,1 @@
+8 - McKINNON WO,Time,Celsius(°C),Dew Point(°C),Humidity(%rh)
