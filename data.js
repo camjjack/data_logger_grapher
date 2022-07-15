@@ -1,8 +1,8 @@
-let {getAverageFromArray} = require('./utils.js')
+const { getAverageFromArray } = require('./utils.js')
 const logger = require('winston')
 
-let initialiseDataDict = function () {
-  let dataDict = {}
+const initialiseDataDict = function () {
+  const dataDict = {}
 
   dataDict.time = []
   dataDict.temperature = []
@@ -16,25 +16,24 @@ let initialiseDataDict = function () {
   return dataDict
 }
 
-let sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
+const sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
   dataDict.dataEntries = dataDict.dataEntries.slice(startIndex, endIndex)
   return dataDict
 }
 
-let processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
-  let data = {temperature: temperature, humidity: humidity, dewPoint: dewPoint, date: date}
+const processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
+  const data = { temperature, humidity, dewPoint, date }
 
   if (data.temperature < maxTemp && data.temperature > minTemp) {
     data.timeStep = dataEntries.length ? data.date.diff(dataEntries[dataEntries.length - 1].date) : 0
     dataEntries.push(data)
-  } else {
   }
   return dataEntries
 }
 
-let computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
+const computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   logger.info('ComputeData with pivot', pivot)
-  let dataDict = initialiseDataDict()
+  const dataDict = initialiseDataDict()
   dataDict.dataEntries = dataEntries
   let startIndex = 0
   let endIndex = dataDict.dataEntries.length
@@ -65,7 +64,7 @@ let computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
       }
     }
   }
-  let reducedDataDict = sliceDataDictArrays(dataDict, startIndex, endIndex)
+  const reducedDataDict = sliceDataDictArrays(dataDict, startIndex, endIndex)
 
   // recalulate above/below if pivot changed.
   logger.debug('length ' + reducedDataDict.dataEntries.length)
@@ -114,7 +113,7 @@ let computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
 }
 
 module.exports = {
-  processDataEntry: processDataEntry,
-  initialiseDataDict: initialiseDataDict,
-  computeData: computeData
+  processDataEntry,
+  initialiseDataDict,
+  computeData
 }

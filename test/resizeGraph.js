@@ -1,15 +1,15 @@
 /* global describe, before, beforeEach, it, afterEach, after */
-var logger = require('../log.js')
+const logger = require('../log.js')
 const chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
-var should = require('chai').should()
-var moment = require('moment')
+const chaiAsPromised = require('chai-as-promised')
+const should = require('chai').should()
+const moment = require('moment')
 chai.use(chaiAsPromised)
 chai.should()
 const path = require('path')
 const testDataPath = require('./config.js').testDataPath
-var importCSV = require('../import.js').importCSV
-var computeData = require('../data.js').computeData
+const importCSV = require('../import.js').importCSV
+const computeData = require('../data.js').computeData
 
 describe('(unit) example suite', () => {
   // Before test suite
@@ -34,9 +34,9 @@ describe('(unit) example suite', () => {
         csvDataDict.timeCooling.should.equal(84240000)
         csvDataDict.sampleTime.should.equal(982860000)
 
-        var startTime = moment('2015-09-05 03:20:30')
-        var endTime = moment('2015-09-10 06:10:30')
-        var resizedData = computeData(csvDataDict.dataEntries, 3, startTime, endTime)
+        const startTime = moment('2015-09-05 03:20:30')
+        const endTime = moment('2015-09-10 06:10:30')
+        const resizedData = computeData(csvDataDict.dataEntries, 3, startTime, endTime)
         logger.info('resized sample time', resizedData.sampleTime)
 
         importCSV(path.join(testDataPath, '1-split.txt'), 10, -10, 3).then((preSplitDataDict) => {
@@ -64,12 +64,12 @@ describe('(unit) example suite', () => {
     it('1.txt', function (done) {
       this.timeout(20000)
       importCSV(path.join(testDataPath, '1.txt'), 10, -10, 3).then((csvDataDict) => {
-        var startTime = moment('2015-09-05 03:20:30')
-        var endTime = moment('2015-09-10 06:10:30')
+        const startTime = moment('2015-09-05 03:20:30')
+        const endTime = moment('2015-09-10 06:10:30')
         computeData(csvDataDict.dataEntries, 3, startTime, endTime)
         csvDataDict.start_time = 0
         csvDataDict.end_time = 0
-        var fullDataDict = computeData(csvDataDict.dataEntries, 3, 0, 0)
+        const fullDataDict = computeData(csvDataDict.dataEntries, 3, 0, 0)
         fullDataDict.sampleTime.should.equal(csvDataDict.sampleTime)
         fullDataDict.cooling_percentage.should.equal(csvDataDict.cooling_percentage)
         fullDataDict.abovePivotPercentage.should.equal(csvDataDict.abovePivotPercentage)

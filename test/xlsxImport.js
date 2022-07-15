@@ -1,14 +1,14 @@
 /* global describe, before, beforeEach, it, afterEach, after */
-var logger = require('../log.js')
+const logger = require('../log.js')
 const chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
 const path = require('path')
 const importFile = require('../import.js')
 const testDataPath = require('./config.js').testDataPath
-var importCSV = importFile.importCSV
-var importExcel = importFile.importExcel
+const importCSV = importFile.importCSV
+const importExcel = importFile.importExcel
 
 describe('(unit) example suite', () => {
   // Before test suite
