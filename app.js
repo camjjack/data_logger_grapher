@@ -1,23 +1,23 @@
 /* global Materialize, Plotly */
 const electron = require('electron')
-let {importExcel, importCSV} = require('./import.js')
-let {computeData} = require('./data.js')
+const { importExcel, importCSV } = require('./import.js')
+const { computeData } = require('./data.js')
 const logger = require('./log.js')
 
 const remote = electron.remote
 const Menu = remote.Menu
 const menu = require('./menu.js')
-let {config} = require('./configuration.js')
-let moment = require('moment')
+let { config } = require('./configuration.js')
+const moment = require('moment')
 const ipcRenderer = electron.ipcRenderer
 
 Menu.setApplicationMenu(Menu.buildFromTemplate(menu.menuTemplate))
 
-let graphData = {}
+const graphData = {}
 let firstFile = {}
 let secondFile = {}
 
-let preloaderSpinner = `
+const preloaderSpinner = `
   <div class="row">
     <div class="col s12 center">
       <div class="preloader-wrapper active center-align">
@@ -36,12 +36,12 @@ let preloaderSpinner = `
     </div>
   </div>`
 
-let preloader = `
+const preloader = `
   <div class="progress" style="width: 100%">
     <div class="determinate" style="width: 0%"></div>
   </div>`
 
-let getTable = function (dataDict, name) {
+const getTable = function (dataDict, name) {
   let s = `<table class="striped"><thead><tr><th data-field="item" colspan="2" class="center-align">${name}</th></tr></thead><tbody>
     <tr><th>Sample time</th><td>${dataDict.sampleTime / 60000} minutes</td></tr>
     <tr><th>% time spent cooling</th><td>${dataDict.cooling_percentage}%</td></tr>
@@ -58,10 +58,10 @@ let getTable = function (dataDict, name) {
   return s
 }
 
-let processFile = function (file, graphDivName, tableDiv) {
-  let graphDiv = document.getElementById(graphDivName)
+const processFile = function (file, graphDivName, tableDiv) {
+  const graphDiv = document.getElementById(graphDivName)
   graphDiv.innerHTML = preloader
-  let originalTableContent = tableDiv.innerHTML
+  const originalTableContent = tableDiv.innerHTML
   tableDiv.innerHTML = preloaderSpinner
   if (file.name.endsWith('.xlsx')) {
     setTimeout(function () {
@@ -90,12 +90,12 @@ let processFile = function (file, graphDivName, tableDiv) {
   }
 }
 
-let doGraph = function (name, graphDivName, tableDiv) {
-  let data = []
-  let layout = {
+const doGraph = function (name, graphDivName, tableDiv) {
+  const data = []
+  const layout = {
     title: name.split('.')[0],
     xaxis: {
-      showgrid: false,                  // remove the x-axis grid lines
+      showgrid: false, // remove the x-axis grid lines
       rangeselector: {}
     }
   }
@@ -107,7 +107,7 @@ let doGraph = function (name, graphDivName, tableDiv) {
       y: graphData[name].temperature,
       name: 'temperature'
     })
-    layout.yaxis = {title: 'Temperature'}
+    layout.yaxis = { title: 'Temperature' }
   }
   if (config.displayHumidity) {
     logger.info('graphing with humidity')
@@ -117,10 +117,11 @@ let doGraph = function (name, graphDivName, tableDiv) {
       name: 'humidity'
     })
     if (layout.yaxis === undefined) {
-      layout.yaxis = {title: 'Humidity'}
+      layout.yaxis = { title: 'Humidity' }
     } else {
       data[1].yaxis = 'y2'
-      layout.yaxis2 = { title: 'Humidity',
+      layout.yaxis2 = {
+        title: 'Humidity',
         overlaying: 'y',
         side: 'right'
       }
@@ -128,13 +129,13 @@ let doGraph = function (name, graphDivName, tableDiv) {
   }
   logger.info('data ' + data[0])
 
-  let myDiv = document.getElementById(graphDivName)
+  const myDiv = document.getElementById(graphDivName)
   Plotly.newPlot(myDiv, data, layout)
 
   myDiv.on('plotly_relayout',
     (eventdata) => {
-      let startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
-      let endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
+      const startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
+      const endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
       logger.debug('Graph relayout:')
       logger.debug('start_time ' + startTime)
       try {
@@ -163,8 +164,8 @@ document.ondrop = (event) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  let first = document.getElementById('first')
-  let second = document.getElementById('second')
+  const first = document.getElementById('first')
+  const second = document.getElementById('second')
   first.ondragover = () => {
     return false
   }
@@ -174,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   first.ondrop = (e) => {
     e.preventDefault()
-    let file = e.dataTransfer.files[0]
-    firstFile = {path: file.path, name: file.name}
+    const file = e.dataTransfer.files[0]
+    firstFile = { path: file.path, name: file.name }
     processFile(firstFile, 'graph1', first)
     return false
   }
@@ -187,8 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   second.ondrop = (e) => {
     e.preventDefault()
-    let file = e.dataTransfer.files[0]
-    secondFile = {path: file.path, name: file.name}
+    const file = e.dataTransfer.files[0]
+    secondFile = { path: file.path, name: file.name }
     processFile(secondFile, 'graph2', second)
     return false
   }

@@ -1,6 +1,6 @@
 const electron = require('electron')
-const app = electron.app  // Module to control application life.
-const BrowserWindow = electron.BrowserWindow  // Module to create native browser window.
+const app = electron.app // Module to control application life.
+const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
 const globalShortcut = electron.globalShortcut
 const dialog = require('electron').dialog
 const fs = require('fs')
@@ -13,7 +13,7 @@ const ipcMain = electron.ipcMain
 let mainWindow = null
 let settingsWindow = null
 let printInProgress = false
-let defaultBounds = { width: 1024, height: 768 }
+const defaultBounds = { width: 1024, height: 768 }
 let currentBounds = defaultBounds
 
 // Quit when all windows are closed.
@@ -25,12 +25,12 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-let printPage = function () {
-  mainWindow.webContents.printToPDF({landscape: true}, (error, data) => {
+const printPage = function () {
+  mainWindow.webContents.printToPDF({ landscape: true }, (error, data) => {
     if (error) {
       throw error
     }
-    let file = dialog.showSaveDialog(mainWindow, {filters: [{name: 'PDF', extensions: ['pdf']}]})
+    const file = dialog.showSaveDialog(mainWindow, { filters: [{ name: 'PDF', extensions: ['pdf'] }] })
     if (file) {
       fs.writeFile(file, data, (error) => {
         if (error) {
@@ -88,7 +88,7 @@ ipcMain.on('close-settings-window', (event, config) => {
   logger.info('close-settings-window')
   if (settingsWindow) {
     logger.info('settingsWindow closed')
-    let webContents = mainWindow.webContents
+    const webContents = mainWindow.webContents
     webContents.send('reprocess', config)
     settingsWindow.close()
   }

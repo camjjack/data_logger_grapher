@@ -2,7 +2,7 @@ const settings = require('electron-settings')
 const logger = require('winston')
 
 settings.defaults({
-  'config': {
+  config: {
     pivot: 3.0,
     maxTemp: 10.0,
     minTemp: -25.0,
@@ -14,17 +14,17 @@ settings.defaults({
 if (!settings.hasSync('config')) {
   settings.resetToDefaultsSync()
 }
-let config = settings.getSync('config')
+const config = settings.getSync('config')
 
 logger.debug('config')
 logger.debug(config)
 
-let save = (c) => {
+const save = (c) => {
   logger.debug('saving config: ')
   logger.debug(c)
   settings.setSync('config', c)
 }
 module.exports = {
-  config: config,
-  save: save
+  config,
+  save
 }

@@ -1,10 +1,10 @@
 const electron = require('electron')
 const ipcRenderer = electron.ipcRenderer
-const app = electron.app  // Module to control application life.
+const app = electron.app // Module to control application life.
 const BrowserWindow = require('electron').remote.BrowserWindow
 const logger = require('winston')
 
-let menuTemplate = [{
+const menuTemplate = [{
   label: 'File',
   submenu: [{
     label: 'Reload',
@@ -45,5 +45,5 @@ let menuTemplate = [{
 ]
 
 module.exports = {
-  menuTemplate: menuTemplate
+  menuTemplate
 }
