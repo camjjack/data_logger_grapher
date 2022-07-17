@@ -1,30 +1,46 @@
-const settings = require('electron-settings')
-const logger = require('winston')
+const Store = require('electron-store')
+const logger = require('./log.js')
 
-settings.defaults({
-  config: {
-    pivot: 3.0,
-    maxTemp: 10.0,
-    minTemp: -25.0,
-    displayTemp: true,
-    displayHumidity: true
+const schema = {
+  pivot: {
+    type: 'number',
+    maximum: 100,
+    minimum: -40,
+    default: 3.0
+  },
+  maxTemp: {
+    type: 'number',
+    maximum: 100,
+    minimum: -40,
+    default: 10
+  },
+  minTemp: {
+    type: 'number',
+    maximum: 100,
+    minimum: -40,
+    default: -25
+  },
+  displayTemp: {
+    type: 'boolean',
+    default: true
+  },
+  displayHumidity: {
+    type: 'boolean',
+    default: true
   }
-})
-
-if (!settings.hasSync('config')) {
-  settings.resetToDefaultsSync()
 }
-const config = settings.getSync('config')
+const store = new Store({ schema })
 
-logger.debug('config')
-logger.debug(config)
+const setConfig = (config) => {
+  logger.debug('saving config')
+  store.set(config)
+}
 
-const save = (c) => {
-  logger.debug('saving config: ')
-  logger.debug(c)
-  settings.setSync('config', c)
+const getConfig = () => {
+  logger.debug('getting config')
+  return store.get()
 }
 module.exports = {
-  config,
-  save
+  setConfig,
+  getConfig
 }

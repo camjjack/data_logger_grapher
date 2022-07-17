@@ -1,5 +1,9 @@
-const { getAverageFromArray } = require('./utils.js')
-const logger = require('winston')
+const getAverageFromArray = (arr, radix = 10, fractionDigits = 2) => {
+  const sum = arr.reduce((accumulator, currentValue) => {
+    return accumulator + parseInt(currentValue, radix)
+  }, 0)
+  return (sum / arr.length).toFixed(fractionDigits)
+}
 
 const initialiseDataDict = function () {
   const dataDict = {}
@@ -21,56 +25,38 @@ const sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
   return dataDict
 }
 
-const processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
-  const data = { temperature, humidity, dewPoint, date }
-
-  if (data.temperature < maxTemp && data.temperature > minTemp) {
-    data.timeStep = dataEntries.length ? data.date.diff(dataEntries[dataEntries.length - 1].date) : 0
-    dataEntries.push(data)
-  }
-  return dataEntries
-}
-
-const computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
-  logger.info('ComputeData with pivot', pivot)
+const computeData = (dataEntries, pivot, startTime = 0, endTime = 0) => {
+  console.log('ComputeData with pivot: ' + pivot + ', startTime: ' + startTime + ', and endTime: ' + endTime)
   const dataDict = initialiseDataDict()
   dataDict.dataEntries = dataEntries
   let startIndex = 0
   let endIndex = dataDict.dataEntries.length
 
   if (endIndex === 0) {
-    logger.error('Wooh there, how did this happen?')
+    console.log('Wooh there, how did this happen?')
     throw Error('Invalid dataDict passed to computeData')
   }
-  if (startTime) {
-    // find the first entry to process
-    logger.info('Trimming data range to start at: ' + startTime)
-    for (let index = 0; index < dataDict.dataEntries.length; index++) {
-      if (startTime.isBefore(dataDict.dataEntries[index].date)) {
-        logger.info('Starting at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
-        startIndex = index
-        break
-      }
+  // converts dates into moment
+  for (let index = 0; index < dataDict.dataEntries.length; index++) {
+    dataDict.dataEntries[index].date = new Date(dataDict.dataEntries[index].date)
+
+    if (startTime && (startIndex === 0) && (startTime <= dataDict.dataEntries[index].date)) {
+      console.log('Starting at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
+      startIndex = index
     }
-  }
-  if (endTime) {
-    // find the first entry to process
-    logger.info('Trimming data range to end at: ' + endTime)
-    for (let index = 0; index < dataDict.dataEntries.length; index++) {
-      if (endTime.isBefore(dataDict.dataEntries[index].date)) {
-        logger.info('Ending at index ' + index + ', time: ' + dataDict.dataEntries[index].date)
-        endIndex = index
-        break
-      }
+    if (endTime && (endIndex === dataDict.dataEntries.length) && (endTime < dataDict.dataEntries[index].date)) {
+      console.log('Ending at index ' + index + ', last valid time: ' + dataDict.dataEntries[index - 1].date)
+      endIndex = index
     }
   }
   const reducedDataDict = sliceDataDictArrays(dataDict, startIndex, endIndex)
 
   // recalulate above/below if pivot changed.
-  logger.debug('length ' + reducedDataDict.dataEntries.length)
-  logger.debug('Ending at ' + reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date)
-  logger.debug('starting at ' + reducedDataDict.dataEntries[0].date)
-  reducedDataDict.sampleTime = reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date.diff(reducedDataDict.dataEntries[0].date)
+  console.log('length ' + reducedDataDict.dataEntries.length)
+  console.log('Ending at ' + reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date)
+  console.log('starting at ' + reducedDataDict.dataEntries[0].date)
+  console.log('timeStep ' + reducedDataDict.dataEntries[0].timeStep)
+  reducedDataDict.sampleTime = reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date - reducedDataDict.dataEntries[0].date
   reducedDataDict.timeCooling = 0
   reducedDataDict.timeAbove = 0
   reducedDataDict.timeBelow = 0
@@ -80,7 +66,7 @@ const computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   reducedDataDict.temperature = []
 
   for (let index = 0; index < reducedDataDict.dataEntries.length; index++) {
-    reducedDataDict.time.push(reducedDataDict.dataEntries[index].date.format())
+    reducedDataDict.time.push(reducedDataDict.dataEntries[index].date)
     reducedDataDict.temperature.push(reducedDataDict.dataEntries[index].temperature)
     reducedDataDict.humidity.push(reducedDataDict.dataEntries[index].humidity)
     reducedDataDict.dewPoint.push(reducedDataDict.dataEntries[index].dewPoint)
@@ -98,13 +84,12 @@ const computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
 
   reducedDataDict.humidityAverage = getAverageFromArray(reducedDataDict.humidity)
   reducedDataDict.dewPointAverage = getAverageFromArray(reducedDataDict.dewPoint)
-  logger.debug('time cooling ' + reducedDataDict.timeCooling)
-  logger.debug('timeAbove ' + reducedDataDict.timeAbove)
-  logger.debug('timeBelow ' + reducedDataDict.timeBelow)
-  logger.debug('humidityAverage ' + reducedDataDict.humidityAverage)
-  logger.debug('dewPointAverage ' + reducedDataDict.dewPointAverage)
-  logger.debug('sampleTime ' + reducedDataDict.sampleTime)
-  logger.debug('sampleTime ' + reducedDataDict.sampleTime)
+  console.log('time cooling ' + reducedDataDict.timeCooling)
+  console.log('timeAbove ' + reducedDataDict.timeAbove)
+  console.log('timeBelow ' + reducedDataDict.timeBelow)
+  console.log('humidityAverage ' + reducedDataDict.humidityAverage)
+  console.log('dewPointAverage ' + reducedDataDict.dewPointAverage)
+  console.log('sampleTime ' + reducedDataDict.sampleTime)
   reducedDataDict.cooling_percentage = ((reducedDataDict.timeCooling / reducedDataDict.sampleTime) * 100).toFixed(2)
   reducedDataDict.abovePivotPercentage = ((reducedDataDict.timeAbove / reducedDataDict.sampleTime) * 100).toFixed(2)
   reducedDataDict.belowPivotPercentage = ((reducedDataDict.timeBelow / reducedDataDict.sampleTime) * 100).toFixed(2)
@@ -112,8 +97,9 @@ const computeData = function (dataEntries, pivot, startTime = 0, endTime = 0) {
   return reducedDataDict
 }
 
-module.exports = {
-  processDataEntry,
-  initialiseDataDict,
-  computeData
+if (typeof module !== 'undefined') {
+  module.exports = {
+    getAverageFromArray,
+    computeData
+  }
 }

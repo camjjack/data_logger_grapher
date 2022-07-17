@@ -1,11 +1,10 @@
 /* global describe, before, beforeEach, it, afterEach, after */
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
-const should = require('chai').should()
-const moment = require('moment')
+chai.should()
 chai.use(chaiAsPromised)
 chai.should()
-const { formatDate, getAverageFromArray, matchInStringArray, fromOADate } = require('../utils.js')
+const { matchInStringArray, fromOADate, parseDate } = require('../utils.js')
 
 describe('(unit) example suite', () => {
   // Before test suite
@@ -18,40 +17,28 @@ describe('(unit) example suite', () => {
     return done()
   })
 
-  describe('fomat valid date', () => {
+  describe('parse valid date', () => {
     it('DD/MM/YYYY HH:mm', function (done) {
-      const a = formatDate('01/02/2014 21:15')
-      a.format().should.equal(moment({ year: 2014, month: 1, day: 1, hour: 21, minute: 15 }).format())
+      const a = parseDate('01/02/2014 21:15')
+      a.toString().should.equal((new Date(2014, 1, 1, 21, 15)).toString())
       done()
     })
     it('DD/MM/YYYY H:mm', function (done) {
-      const a = formatDate('03/12/2017 2:54')
-      a.format().should.equal(moment({ year: 2017, month: 11, day: 3, hour: 2, minute: 54 }).format())
+      const a = parseDate('03/12/2017 2:54')
+      a.toString().should.equal((new Date(2017, 11, 3, 2, 54)).toString())
       done()
     })
     it('YYYY-MM-DD HH:mm:ss', function (done) {
-      const a = formatDate('2011-05-08 11:02:45')
-      a.format().should.equal(moment({ year: 2011, month: 4, day: 8, hour: 11, minute: 2, seconds: 45 }).format())
+      const a = parseDate('2011-05-08 11:02:45')
+      a.toString().should.equal((new Date(2011, 4, 8, 11, 2, 45)).toString())
       done()
     })
   })
 
   describe('fomat invalid date', () => {
     it('0122/2014 21:15', function (done) {
-      const a = formatDate('0122/2014 21:15')
-      a.format().should.equal('Invalid date')
-      done()
-    })
-  })
-
-  describe('getAverageFromArray', () => {
-    it('valid', function (done) {
-      const a = [25, 60, 100, 2015, 45]
-      getAverageFromArray(a, 10, 2).should.equal((449).toFixed(2))
-      done()
-    })
-    it('invalid', function (done) {
-      should.Throw(() => { getAverageFromArray({ invalid: 45 }) }, Error)
+      const a = parseDate('0122/2014 21:15')
+      a.toString().should.equal('Invalid Date')
       done()
     })
   })
@@ -59,46 +46,46 @@ describe('(unit) example suite', () => {
   describe('matchInStringArray', () => {
     it('valid case insensitive', function (done) {
       const a = ['green', 'red', 'blue']
-      matchInStringArray('Red', a, false).should.be.true
+      matchInStringArray('Red', a, false).should.equal(true)
       done()
     })
     it('valid case sensitive', function (done) {
       const a = ['green', 'red', 'blue']
-      matchInStringArray('red', a, true).should.be.true
+      matchInStringArray('red', a, true).should.equal(true)
       done()
     })
     it('valid case sensitive by default', function (done) {
       const a = ['green', 'red', 'blue']
-      matchInStringArray('blue', a).should.be.true
+      matchInStringArray('blue', a).should.equal(true)
       done()
     })
     it('invalid case insensitive', function (done) {
       const a = ['green', 'red', 'blue']
-      matchInStringArray('brown', a, false).should.be.false
+      matchInStringArray('brown', a, false).should.equal(false)
       done()
     })
     it('valid case sensitive', function (done) {
       const a = ['green', 'red', 'blue']
-      matchInStringArray('Red', a, true).should.be.false
+      matchInStringArray('Red', a, true).should.equal(false)
       done()
     })
   })
 
-  describe('fromOADate', () => {
-    // it('valid prior 1900', function (done) {
-    //   fromOADate(-3412.154).format().should.equal(moment({ year: 1890, month: 7, day: 26, hour: 20, minute: 18, seconds: 14 }).format())
-    //   done()
-    // })
+  describe('fromOADate tests', () => {
+    it('valid prior 1900', function (done) {
+      fromOADate(-3412.154).toString().should.equal(new Date(1890, 7, 26, 20, 19, 6).toString())
+      done()
+    })
     it('invalid parameter', function (done) {
-      fromOADate('1900/12/11 05:12').format().should.equal('Invalid date')
+      fromOADate('1900/12/11 05:12').toString().should.equal('Invalid Date')
       done()
     })
     it('invalid date', function (done) {
-      fromOADate(-4654654898).format().should.equal('Invalid date')
+      fromOADate(-4654654898).toString().should.equal('Invalid Date')
       done()
     })
     it('valid pre 1900', function (done) {
-      fromOADate(42456.125).format().should.equal(moment({ year: 2016, month: 2, day: 27, hour: 3 }).format())
+      fromOADate(42456.125).toString().should.equal((new Date(2016, 2, 27, 3).toString()))
       done()
     })
   })

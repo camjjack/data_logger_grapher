@@ -1,8 +1,9 @@
-const electron = require('electron')
-const ipcRenderer = electron.ipcRenderer
-const app = electron.app // Module to control application life.
-const BrowserWindow = require('electron').remote.BrowserWindow
-const logger = require('winston')
+const { app, BrowserWindow } = require('electron')
+const logger = require('./log.js')
+const { dialog } = require('electron')
+const { processFile } = require('./import.js')
+const { createSettingsWindow } = require('./settingsWindow.js')
+const { printPage } = require('./print.js')
 
 const menuTemplate = [{
   label: 'File',
@@ -22,7 +23,31 @@ const menuTemplate = [{
     label: 'Print',
     accelerator: 'CmdOrCtrl+P',
     click: () => {
-      ipcRenderer.send('print-page')
+      printPage()
+    }
+  }, {
+    label: 'Load First File',
+    accelerator: 'CmdOrCtrl+1',
+    click: () => {
+      logger.info('Load First File')
+      const files = dialog.showOpenDialogSync({ filters: [{ name: 'Data Logger Supported File Types', extensions: ['txt', 'csv', 'xlsx'] }], properties: ['openFile'] })
+      if (files !== undefined) {
+        logger.info('opening ' + files[0])
+        logger.info('typeof ' + typeof (files[0]))
+        processFile(1, files[0])
+      }
+    }
+  }, {
+    label: 'Load Second File',
+    accelerator: 'CmdOrCtrl+2',
+    click: () => {
+      logger.info('Load Second File')
+      const files = dialog.showOpenDialogSync({ filters: [{ name: 'Data Logger Supported File Types', extensions: ['txt', 'csv', 'xlsx'] }], properties: ['openFile'] })
+      if (files !== undefined) {
+        logger.info('opening ' + files[0])
+        logger.info('typeof ' + typeof (files[0]))
+        processFile(2, files[0])
+      }
     }
   }, {
     label: 'Quit',
@@ -38,7 +63,7 @@ const menuTemplate = [{
     accelerator: 'CmdOrCtrl+S',
     click: () => {
       logger.info('opening window')
-      ipcRenderer.send('open-settings-window')
+      createSettingsWindow()
     }
   }]
 }
