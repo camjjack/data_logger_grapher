@@ -72,10 +72,6 @@ describe('(unit) example suite', () => {
   })
 
   describe('fromOADate tests', () => {
-    it('valid prior 1900', function (done) {
-      fromOADate(-3412.154).toString().should.equal(new Date(1890, 7, 26, 20, 19, 6).toString())
-      done()
-    })
     it('invalid parameter', function (done) {
       fromOADate('1900/12/11 05:12').toString().should.equal('Invalid Date')
       done()
