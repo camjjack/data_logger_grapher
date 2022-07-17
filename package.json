@@ -41,10 +41,8 @@
     "win": {
       "target": "nsis"
     },
-    "mac": {
-      "category": "public.app-category.tools"
-    },
     "linux": {
+      "category": "Utility",
       "target": [
         "deb",
         "AppImage"
@@ -71,23 +69,20 @@
     "url": "https://github.com/camjjack/data_logger_grapher/issues"
   },
   "devDependencies": {
-    "asn1": "^0.2.6",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "electron": "^19.0.8",
     "electron-builder": "^23.1.0",
     "electron-mocha": "^11.0.2",
     "mocha": "^10.0.0",
-    "mocha-appveyor-reporter": "^0.4.2",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "standard": "^17.0.0"
   },
   "dependencies": {
-    "electron-settings": "^4.0.2",
+    "electron-store": "^8.0.2",
     "fast-csv": "^4.3.6",
     "hammerjs": "^2.0.8",
     "materialize-css": "^1.0.0",
-    "moment": "^2.29.4",
-    "standard": "^17.0.0",
     "winston": "^3.8.1",
     "xlsx-extractor": "^1.4.1"
   }

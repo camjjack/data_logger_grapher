@@ -1,8 +1,9 @@
 const csv = require('fast-csv')
-const { formatDate, matchInStringArray, fromOADate } = require('./utils.js')
-const { processDataEntry, computeData } = require('./data.js')
-const logger = require('winston')
-const xlsx = require('xlsx-extractor');
+const { matchInStringArray, fromOADate, parseDate } = require('./utils.js')
+const logger = require('./log.js')
+const xlsx = require('xlsx-extractor')
+const { getConfig } = require('./configuration.js')
+const { getWebContents } = require('./mainWindow.js')
 
 // todo. make these settings.
 const tempNames = ['celsius', 'temp']
@@ -10,7 +11,17 @@ const humidityNames = ['hum']
 const timeNames = ['time', 'date']
 const dewPointNames = ['dew point']
 
-const importExcel = function (filePath, maxTemp, minTemp, pivot, setProgress = () => { }) {
+const processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
+  const data = { temperature, humidity, dewPoint, date }
+
+  if (data.temperature < maxTemp && data.temperature > minTemp) {
+    data.timeStep = dataEntries.length ? data.date - dataEntries[dataEntries.length - 1].date : 0
+    dataEntries.push(data)
+  }
+  return dataEntries
+}
+
+const importExcel = (filePath, maxTemp, minTemp, setProgress = () => { }) => {
   return new Promise((resolve, reject) => {
     let dataEntries = []
     logger.info('Importing xlsx from ' + filePath)
@@ -31,9 +42,10 @@ const importExcel = function (filePath, maxTemp, minTemp, pivot, setProgress = (
         }
 
         for (let i = 1; i < results[0].cells.length; i++) {
-          setProgress(20 + (i / results[0].cells.length) * 60) // 20% for loading, 20% for graph drawing. 60% for this loop, 20% for graph
+          //  setProgress(20 + (i / results[0].cells.length) * 60) // 20% for loading, 20% for graph drawing. 60% for this loop, 20% for graph
 
           const temperature = parseFloat(results[0].cells[i][validatedKeys.temp])
+
           if (isNaN(temperature)) {
             // This is likely the start of superfluous rows
             logger.info('Reached end of valid rows at index: ' + i)
@@ -44,9 +56,7 @@ const importExcel = function (filePath, maxTemp, minTemp, pivot, setProgress = (
           const dewPoint = parseFloat(results[0].cells[i][validatedKeys.dewPoint])
           dataEntries = processDataEntry(dataEntries, temperature, humidity, timeDate, dewPoint, maxTemp, minTemp)
         }
-
-        const dataDict = computeData(dataEntries, pivot)
-        resolve(dataDict)
+        resolve(JSON.stringify(dataEntries))
       })
       .catch((err) => {
         logger.error(err)
@@ -55,7 +65,7 @@ const importExcel = function (filePath, maxTemp, minTemp, pivot, setProgress = (
   })
 }
 
-function validateHeaders(headers) {
+const validateHeaders = (headers) => {
   const validatedKeys = {}
   validatedKeys.temp = -1
   validatedKeys.humidity = -1
@@ -97,7 +107,7 @@ function validateHeaders(headers) {
   return validatedKeys
 }
 
-const importCSV = function (filePath, maxTemp, minTemp, pivot) {
+const importCSV = (filePath, maxTemp, minTemp) => {
   return new Promise((resolve, reject) => {
     let headingsValidated = false
     let dataEntries = []
@@ -112,7 +122,6 @@ const importCSV = function (filePath, maxTemp, minTemp, pivot) {
           try {
             headingsValidated = true
             keys = validateHeaders(rawData)
-            headingsValid = true
           } catch (err) {
             reject(Error(err))
           }
@@ -122,23 +131,17 @@ const importCSV = function (filePath, maxTemp, minTemp, pivot) {
       .on('data', (rawData) => {
         const temperature = parseFloat(rawData[keys.temp])
         const humidity = keys.humidity !== -1 ? parseFloat(rawData[keys.humidity]) : NaN
-        const time = formatDate(rawData[keys.time])
+        const time = parseDate(rawData[keys.time])
         const dewPoint = keys.dewPoint !== -1 ? parseFloat(rawData[keys.dewPoint]) : NaN
 
         dataEntries = processDataEntry(dataEntries, temperature, humidity, time, dewPoint, maxTemp, minTemp)
-        logger.debug('data entries length: ' + dataEntries.length)
       })
       .on('end', () => {
         if (keys) {
           logger.debug('data entries final length: ' + dataEntries.length)
           try {
-            const dataDict = computeData(dataEntries, pivot)
-            if (keys.humidity === -1) {
-              logger.debug('data entries after length: ' + dataDict.dataEntries.length)
-            }
-            logger.debug('End of import, sampleTime = ' + dataDict.sampleTime)
-            logger.silly(dataDict)
-            resolve(dataDict)
+            resolve(JSON.stringify(dataEntries))
+            logger.debug('resolve')
           } catch (e) {
             reject(Error('Data import Error'))
           }
@@ -153,7 +156,36 @@ const importCSV = function (filePath, maxTemp, minTemp, pivot) {
   })
 }
 
+const processFile = (index, filePath) => {
+  logger.info('processFile: ' + filePath)
+  const config = getConfig()
+  const webContents = getWebContents()
+  const filename = filePath.split('/').pop()
+  if (filePath.endsWith('.xlsx')) {
+    setTimeout(function () {
+      importExcel(filePath, config.maxTemp, config.minTemp, config.pivot, (progress) => { /* graphDiv.getElementsByClassName('determinate')[0].style.width = `${progress}%` */ }).then((xlsxDict) => {
+        logger.debug('done importExcel')
+        webContents.send('update-graph', index, filename, xlsxDict)
+      }, (error) => {
+        logger.log('error', 'Failed to import xlsx ' + error)
+      })
+    }, 500)
+  } else {
+    setTimeout(function () {
+      importCSV(filePath, config.maxTemp, config.minTemp, config.pivot).then(csvDataDict => {
+        logger.debug('done importCSV')
+        webContents.send('update-graph', index, filename, csvDataDict)
+      }, (error) => {
+        logger.log('error', 'Failed to import csv', error)
+      }).catch((err) => {
+        logger.error(err)
+      })
+    }, 500)
+  }
+}
+
 module.exports = {
-  importExcel,
-  importCSV
+  processFile,
+  importCSV,
+  importExcel
 }

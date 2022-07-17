@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Data Logger Grapher</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="node_modules/materialize-css/dist/css/materialize.min.css" rel="stylesheet">
-    <link href="./style.css" rel="stylesheet">
-    <!-- Latest compiled and minified plotly.js JavaScript -->
-    <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="node_modules/hammerjs/hammer.min.js"></script>
-    <script type="text/javascript" src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
-    <script type="text/javascript" src="./app.js"></script>
 
-  </head>
-  <body>
-    <div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
-  
-   <div class="row">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://momentjs.com https://cdn.plot.ly/ https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src data:;">
+  <title>Data Logger Grapher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--<link href="node_modules/materialize-css/dist/css/materialize.min.css" rel="stylesheet">-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="./style.css" rel="stylesheet">
+  <!-- Latest compiled and minified plotly.js JavaScript -->
+  <script type="text/javascript" src="https://cdn.plot.ly/plotly-strict-2.11.0.min.js"></script>
+  <script type="text/javascript" src="node_modules/hammerjs/hammer.min.js"></script>
+  <!--<script type="text/javascript" src="https://momentjs.com/downloads/moment.min.js"></script>-->
+  <!--<script type="text/javascript" src="node_modules/materialize-css/dist/js/materialize.min.js"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</head>
+
+<body>
+  <div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
+
+    <div class="row">
       <div class="col s8">
-          <div class="valign-wrapper row" id="graph1" style="height: 45vh; margin: 2.5% 0 0 0; width: 100%"></div>
-          <div class="valign-wrapper row" id="graph2" style="height: 45vh; margin: 2.5% 0 0 0; width: 100%"></div>
+        <div class="valign-wrapper row" id="graph1" style="height: 45vh; margin: 2.5% 0 0 0; width: 100%"></div>
+        <div class="valign-wrapper row" id="graph2" style="height: 45vh; margin: 2.5% 0 0 0; width: 100%"></div>
       </div>
       <div class="col s4">
-          <div class="valign-wrapper row" id="first" style="height: 45vh; background-color: #ddd; margin: 2% 0 0 0"><h5 class="valign center" style="width: 100%">Drag your first data set here</h5></div>
-          <div class="valign-wrapper row" id="second" style="height: 45vh; background-color: #ddd; margin: 2% 0 0 0"><h5 class="valign center" style="width: 100%">Drag your second data set here</h5></div>
+        <div class="valign-wrapper row" id="table1" style="height: 45vh; background-color: #ddd; margin: 2% 0 0 0">
+          <h5 class="valign center" style="width: 100%">Press Ctrl+1 or File Menu -> Load First File to load this data
+            set</h5>
+        </div>
+        <div class="valign-wrapper row" id="table2" style="height: 45vh; background-color: #ddd; margin: 2% 0 0 0">
+          <h5 class="valign center" style="width: 100%">Press Ctrl+2 or File Menu -> Load Second File to load this data
+            set</h5>
+        </div>
       </div>
     </div>
-</div>
-  </body>
+  </div>
+  <script type="text/javascript" src="./renderer.js"></script>
+  <script type="text/javascript" src="./data.js"></script>
+</body>
+
 </html>
