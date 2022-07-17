@@ -18,7 +18,7 @@ const createSettingsWindow = () => {
     }
   })
   settingsWindow.loadFile('settings.html')
-  //  settingsWindow.webContents.openDevTools()
+  //settingsWindow.webContents.openDevTools()
 
   settingsWindow.on('closed', () => {
     settingsWindow = null
