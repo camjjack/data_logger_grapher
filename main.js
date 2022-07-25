@@ -2,9 +2,10 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const logger = require('./log.js')
 const menu = require('./menu.js')
 const { closeSettingsWindow } = require('./settingsWindow.js')
-const { createWindow, getWebContents } = require('./mainWindow.js')
+const { createWindow } = require('./mainWindow.js')
 const { printPage } = require('./print.js')
 const { getConfig, setConfig } = require('./configuration.js')
+const { reprocess } = require('./import.js')
 
 Menu.setApplicationMenu(Menu.buildFromTemplate(menu.menuTemplate))
 
@@ -22,7 +23,7 @@ ipcMain.on('print-page', () => {
 const handleCloseSettingsWindow = (event) => {
   logger.info('close-settings-window')
   closeSettingsWindow()
-  getWebContents().send('reprocess')
+  reprocess()
 }
 
 async function handleGetConfig (event) {

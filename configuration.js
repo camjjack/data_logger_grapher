@@ -27,6 +27,10 @@ const schema = {
   displayHumidity: {
     type: 'boolean',
     default: true
+  },
+  detectCoolingViaHumidityInc: {
+    type: 'boolean',
+    default: false
   }
 }
 const store = new Store({ schema })

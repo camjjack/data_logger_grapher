@@ -10,7 +10,7 @@ const createSettingsWindow = () => {
 
   settingsWindow = new BrowserWindow({
     frame: false,
-    height: 350,
+    height: 380,
     resizable: false,
     width: 1000,
     webPreferences: {
@@ -18,7 +18,7 @@ const createSettingsWindow = () => {
     }
   })
   settingsWindow.loadFile('settings.html')
-  //settingsWindow.webContents.openDevTools()
+  // settingsWindow.webContents.openDevTools()
 
   settingsWindow.on('closed', () => {
     settingsWindow = null

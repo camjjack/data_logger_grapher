@@ -36,7 +36,7 @@ describe('(unit) example suite', () => {
 
         const startTime = new Date('2015-09-05 03:20:30')
         const endTime = new Date('2015-09-10 06:10:30')
-        const resizedData = computeData(JSON.parse(csvDataDict), 3, startTime, endTime)
+        const resizedData = computeData(JSON.parse(csvDataDict), 3, false, startTime, endTime)
 
         logger.info('resized sample time', resizedData.sampleTime)
 

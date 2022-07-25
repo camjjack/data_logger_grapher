@@ -42,7 +42,8 @@ window.electronAPI.handleDoGraph(async (event, index, filename, dataStr) => {
   const graphDiv = document.getElementById('graph' + index)
   const tableDiv = document.getElementById('table' + index)
   const config = await window.electronAPI.getConfig()
-  const importData = computeData(JSON.parse(dataStr), config.pivot)
+  console.log('config.detectCoolingViaHumidityInc = ' + config.detectCoolingViaHumidityInc)
+  const importData = computeData(JSON.parse(dataStr), config.pivot, config.detectCoolingViaHumidityInc)
   // let data = JSON.parse(value["data"]);
   console.log(importData)
   const data = []
@@ -91,7 +92,7 @@ window.electronAPI.handleDoGraph(async (event, index, filename, dataStr) => {
       console.log('Graph relayout:')
       console.log('start_time ' + startTime)
       try {
-        tableDiv.innerHTML = getTable(computeData(JSON.parse(dataStr), config.pivot, startTime, endTime), filename, config.pivot)
+        tableDiv.innerHTML = getTable(computeData(JSON.parse(dataStr), config.pivot, config.detectCoolingViaHumidityInc, startTime, endTime), filename, config.pivot)
       } catch (error) {
         M.toast(`Error: ${error}`)
       }
@@ -104,67 +105,3 @@ window.electronAPI.handleDoGraph(async (event, index, filename, dataStr) => {
   window.addEventListener('resize', () => { Plotly.Plots.resize(graphDiv) })
   tableDiv.innerHTML = getTable(importData, filename, config.pivot)
 })
-// window.electronAPI.handleDoGraph((event, name, importData, graphDivName, tableDiv) => {
-//     console.log("in DoGraph")
-//     //const config = await window.electronAPI.getConfig()
-//     const data = []
-//     const layout = {
-//         title: name.split('.')[0],
-//         xaxis: {
-//             showgrid: false, // remove the x-axis grid lines
-//             rangeselector: {}
-//         }
-//     }
-
-//     if (config.displayTemp) {
-//         logger.info('graphing with temp')
-//         data.push({
-//             x: importData.time,
-//             y: importData.temperature,
-//             name: 'temperature'
-//         })
-//         layout.yaxis = { title: 'Temperature' }
-//     }
-//     if (config.displayHumidity) {
-//         logger.info('graphing with humidity')
-//         data.push({
-//             x: importData.time,
-//             y: importData.humidity,
-//             name: 'humidity'
-//         })
-//         if (layout.yaxis === undefined) {
-//             layout.yaxis = { title: 'Humidity' }
-//         } else {
-//             data[1].yaxis = 'y2'
-//             layout.yaxis2 = {
-//                 title: 'Humidity',
-//                 overlaying: 'y',
-//                 side: 'right'
-//             }
-//         }
-//     }
-//     logger.info('data ' + data[0])
-
-//     const myDiv = document.getElementById(graphDivName)
-//     Plotly.newPlot(myDiv, data, layout)
-
-//     myDiv.on('plotly_relayout',
-//         (eventdata) => {
-//             const startTime = eventdata['xaxis.range[0]'] !== undefined ? moment(eventdata['xaxis.range[0]']) : 0
-//             const endTime = eventdata['xaxis.range[1]'] !== undefined ? moment(eventdata['xaxis.range[1]']) : 0
-//             logger.debug('Graph relayout:')
-//             logger.debug('start_time ' + startTime)
-//             try {
-//                 tableDiv.innerHTML = getTable(computeData(importData.dataEntries, config.pivot, startTime, endTime), name)
-//             } catch (error) {
-//                 Materialize.toast(`Error: ${error}`)
-//             }
-
-//             // tell the main process we have finished.
-//             ipcRenderer.send('resising-finished')
-//         }
-//     )
-
-//     window.addEventListener('resize', () => { Plotly.Plots.resize(myDiv) })
-//     tableDiv.innerHTML = getTable(importData, name)
-// })
