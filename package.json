@@ -1,7 +1,7 @@
 {
   "name": "data_logger_grapher",
   "productName": "data_logger_grapher",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "main": "main.js",
   "description": "Compares two temperature data logger data sets use for refrigeration and print graphs and data associated with cooling periods etc.",
   "author": {

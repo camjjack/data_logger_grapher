@@ -11,6 +11,8 @@ const humidityNames = ['hum']
 const timeNames = ['time', 'date']
 const dewPointNames = ['dew point']
 
+const files = []
+
 const processDataEntry = function (dataEntries, temperature, humidity, date, dewPoint, maxTemp, minTemp) {
   const data = { temperature, humidity, dewPoint, date }
 
@@ -158,6 +160,7 @@ const importCSV = (filePath, maxTemp, minTemp) => {
 
 const processFile = (index, filePath) => {
   logger.info('processFile: ' + filePath)
+  files[index] = filePath
   const config = getConfig()
   const webContents = getWebContents()
   const filename = filePath.split('/').pop()
@@ -184,8 +187,15 @@ const processFile = (index, filePath) => {
   }
 }
 
+const reprocess = () => {
+  for (let i = 0; i < files.length; ++i) {
+    if (files[i]) { processFile(i, files[i]) }
+  }
+}
+
 module.exports = {
   processFile,
   importCSV,
-  importExcel
+  importExcel,
+  reprocess
 }

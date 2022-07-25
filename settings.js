@@ -3,6 +3,7 @@ const slider = document.getElementById('range')
 const temperature = document.getElementById('temperature')
 const pivot = document.getElementById('pivot')
 const humitity = document.getElementById('humitity')
+const detectCoolingViaHumidityInc = document.getElementById('detectCoolingViaHumidityInc')
 
 /* eslint-disable no-unused-vars */
 const saveConfig = () => {
@@ -17,6 +18,7 @@ const saveConfig = () => {
   config.displayTemp = temperature.checked
 
   config.displayHumidity = humitity.checked
+  config.detectCoolingViaHumidityInc = detectCoolingViaHumidityInc.checked
 
   console.log('saving: ' + config)
   window.electronAPI.setConfig(config)
@@ -41,4 +43,5 @@ window.electronAPI.getConfig().then((config) => {
   })
   temperature.checked = config.displayTemp
   humitity.checked = config.displayHumidity
+  detectCoolingViaHumidityInc.checked = config.detectCoolingViaHumidityInc
 })

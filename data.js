@@ -25,8 +25,8 @@ const sliceDataDictArrays = function (dataDict, startIndex, endIndex) {
   return dataDict
 }
 
-const computeData = (dataEntries, pivot, startTime = 0, endTime = 0) => {
-  console.log('ComputeData with pivot: ' + pivot + ', startTime: ' + startTime + ', and endTime: ' + endTime)
+const computeData = (dataEntries, pivot, humidityCoolingMethod = false, startTime = 0, endTime = 0) => {
+  console.log('ComputeData with pivot: ' + pivot + ', startTime: ' + startTime + ', endTime: ' + endTime + ', and humidityCoolingMethod: ' + humidityCoolingMethod)
   const dataDict = initialiseDataDict()
   dataDict.dataEntries = dataEntries
   let startIndex = 0
@@ -58,6 +58,7 @@ const computeData = (dataEntries, pivot, startTime = 0, endTime = 0) => {
   console.log('timeStep ' + reducedDataDict.dataEntries[0].timeStep)
   reducedDataDict.sampleTime = reducedDataDict.dataEntries[reducedDataDict.dataEntries.length - 1].date - reducedDataDict.dataEntries[0].date
   reducedDataDict.timeCooling = 0
+  reducedDataDict.timeCoolingViaHumity = 0
   reducedDataDict.timeAbove = 0
   reducedDataDict.timeBelow = 0
   reducedDataDict.humidity = []
@@ -74,6 +75,9 @@ const computeData = (dataEntries, pivot, startTime = 0, endTime = 0) => {
       if (reducedDataDict.dataEntries[index].temperature < reducedDataDict.dataEntries[index - 1].temperature) {
         reducedDataDict.timeCooling += reducedDataDict.dataEntries[index].timeStep
       }
+      if (reducedDataDict.dataEntries[index].humidity > reducedDataDict.dataEntries[index - 1].humidity) {
+        reducedDataDict.timeCoolingViaHumity += reducedDataDict.dataEntries[index].timeStep
+      }
       if (reducedDataDict.dataEntries[index].temperature > pivot) {
         reducedDataDict.timeAbove += reducedDataDict.dataEntries[index].timeStep
       } else if (reducedDataDict.dataEntries[index].temperature < pivot) {
@@ -85,12 +89,13 @@ const computeData = (dataEntries, pivot, startTime = 0, endTime = 0) => {
   reducedDataDict.humidityAverage = getAverageFromArray(reducedDataDict.humidity)
   reducedDataDict.dewPointAverage = getAverageFromArray(reducedDataDict.dewPoint)
   console.log('time cooling ' + reducedDataDict.timeCooling)
+  console.log('time cooling (via humity increase method)' + reducedDataDict.timeCoolingViaHumity)
   console.log('timeAbove ' + reducedDataDict.timeAbove)
   console.log('timeBelow ' + reducedDataDict.timeBelow)
   console.log('humidityAverage ' + reducedDataDict.humidityAverage)
   console.log('dewPointAverage ' + reducedDataDict.dewPointAverage)
   console.log('sampleTime ' + reducedDataDict.sampleTime)
-  reducedDataDict.cooling_percentage = ((reducedDataDict.timeCooling / reducedDataDict.sampleTime) * 100).toFixed(2)
+  reducedDataDict.cooling_percentage = (((humidityCoolingMethod ? reducedDataDict.timeCoolingViaHumity : reducedDataDict.timeCooling) / reducedDataDict.sampleTime) * 100).toFixed(2)
   reducedDataDict.abovePivotPercentage = ((reducedDataDict.timeAbove / reducedDataDict.sampleTime) * 100).toFixed(2)
   reducedDataDict.belowPivotPercentage = ((reducedDataDict.timeBelow / reducedDataDict.sampleTime) * 100).toFixed(2)
 
